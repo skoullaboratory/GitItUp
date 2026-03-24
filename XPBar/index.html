@@ -11,10 +11,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
 </head>
 
-
-<body>
+<body class="mode-circular">
+  <!-- 1. Circular Mode -->
   <div class="xp-circle-wrapper">
-    <!-- SVG Progress Ring -->
     <svg class="xp-ring-svg" viewBox="0 0 80 80">
       <defs>
         <linearGradient id="xp-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -22,26 +21,29 @@
           <stop offset="100%" stop-color="#76ff03" />
         </linearGradient>
       </defs>
-      <!-- Background track -->
       <circle class="xp-ring-track" cx="40" cy="40" r="30" />
-      <!-- Progress arc -->
       <circle id="xp-progress" class="xp-ring-progress" cx="40" cy="40" r="30" />
     </svg>
-
-    <!-- Level badge in the center -->
     <div class="xp-center">
       <div id="xp-level" class="xp-level-badge">1</div>
-      <div id="particles"></div>
     </div>
   </div>
 
+  <!-- 2. Horizontal Mode -->
+  <div class="xp-horizontal-wrapper">
+    <div class="xp-bar-level" id="xp-bar-level">1</div>
+    <div class="xp-bar-track">
+      <div class="xp-bar-fill" id="xp-bar-fill"></div>
+    </div>
+  </div>
 
+  <div id="particles"></div>
 
   <script>
     const { ipcRenderer } = require('electron');
 
     // ── Constants ──
-    const CIRCUMFERENCE = 2 * Math.PI * 30; // ≈ 188.5
+    const CIRCUMFERENCE = 2 * Math.PI * 30;
     const BASE_XP = 100;
     const XP_PER_COMMIT = 25;
     const GROWTH_FACTOR = 1.5;
@@ -49,15 +51,18 @@
     // ── DOM Elements ──
     const progressEl = document.getElementById('xp-progress');
     const levelEl = document.getElementById('xp-level');
-    const wrapper = document.querySelector('.xp-circle-wrapper');
+    const barFillEl = document.getElementById('xp-bar-fill');
+    const barLevelEl = document.getElementById('xp-bar-level');
+    const circleWrapper = document.querySelector('.xp-circle-wrapper');
+    const horizontalWrapper = document.querySelector('.xp-horizontal-wrapper');
     const particlesContainer = document.getElementById('particles');
-
 
     // ── State ──
     let level = 1;
     let currentXP = 0;
     let totalCommits = 0;
     let isInitialized = false;
+    let currentShape = 'circular';
 
     function getMaxXP(lvl) {
       return Math.floor(BASE_XP * Math.pow(GROWTH_FACTOR, lvl - 1));
@@ -66,18 +71,21 @@
     function updateRing() {
       const maxXP = getMaxXP(level);
       const progress = Math.min(currentXP / maxXP, 1);
+      
+      // Update Circle
       const offset = CIRCUMFERENCE * (1 - progress);
       progressEl.style.strokeDashoffset = offset;
       levelEl.textContent = level;
 
+      // Update Bar
+      barFillEl.style.width = `${progress * 100}%`;
+      barLevelEl.textContent = level;
 
-      // Save to disk only if loaded
       if (isInitialized) {
         ipcRenderer.send('save-data', { level, currentXP, totalCommits });
       }
     }
 
-    // ── Add XP with level-up logic ──
     function addXP(amount) {
       currentXP += amount;
       let maxXP = getMaxXP(level);
@@ -101,38 +109,41 @@
 
     function triggerGainXPEffects() {
       document.body.classList.add('is-animating');
-      progressEl.classList.remove('xp-gain-anim');
-      void progressEl.offsetWidth; // Trigger reflow
-      progressEl.classList.add('xp-gain-anim');
+      const activeElement = currentShape === 'circular' ? progressEl : barFillEl;
       
-      setTimeout(() => {
-        document.body.classList.remove('is-animating');
-      }, 800);
+      activeElement.classList.remove('xp-gain-anim');
+      void activeElement.offsetWidth;
+      activeElement.classList.add('xp-gain-anim');
+      
+      setTimeout(() => document.body.classList.remove('is-animating'), 800);
     }
 
     function triggerLevelUpEffects() {
       document.body.classList.add('is-animating');
+      const container = currentShape === 'circular' ? circleWrapper : horizontalWrapper;
+      const levelBadge = currentShape === 'circular' ? levelEl : barLevelEl;
 
-      // Flash the whole ring
-      wrapper.classList.remove('level-up-anim');
-      void wrapper.offsetWidth;
-      wrapper.classList.add('level-up-anim');
+      container.classList.remove('level-up-anim');
+      void container.offsetWidth;
+      container.classList.add('level-up-anim');
 
-      // Pop the badge
-      levelEl.classList.remove('badge-pop');
-      void levelEl.offsetWidth;
-      levelEl.classList.add('badge-pop');
+      levelBadge.classList.remove('badge-pop');
+      void levelBadge.offsetWidth;
+      levelBadge.classList.add('badge-pop');
 
-      // Explode particles
       triggerParticles();
-
-      setTimeout(() => {
-        document.body.classList.remove('is-animating');
-      }, 1500);
+      setTimeout(() => document.body.classList.remove('is-animating'), 1500);
     }
 
     function triggerParticles() {
-      for (let i = 0; i < 20; i++) {
+      const container = currentShape === 'circular' ? circleWrapper : horizontalWrapper;
+      // Center particles in the container
+      const rect = container.getBoundingClientRect();
+      particlesContainer.style.left = `${rect.left + rect.width / 2}px`;
+      particlesContainer.style.top = `${rect.top + rect.height / 2}px`;
+
+      const count = currentShape === 'circular' ? 20 : 30;
+      for (let i = 0; i < count; i++) {
         const p = document.createElement('div');
         p.className = 'particle';
         const angle = Math.random() * Math.PI * 2;
@@ -145,17 +156,15 @@
         p.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
         
         particlesContainer.appendChild(p);
-        setTimeout(() => p.remove(), 1000);
+        setTimeout(() => p.remove(), 1500);
       }
     }
 
-    // ── Git Commit Event ──
     ipcRenderer.on('git-commit', () => {
       totalCommits++;
       addXP(XP_PER_COMMIT);
     });
 
-    // ── Load saved data ──
     ipcRenderer.on('init-data', (event, data) => {
       level = data.level || 1;
       currentXP = data.currentXP || 0;
@@ -164,16 +173,18 @@
       updateRing();
     });
 
+    ipcRenderer.on('update-style', (event, { shape, position }) => {
+      currentShape = shape;
+      document.body.className = `mode-${shape}`;
+      // Tell main to refresh context menu checkmarks
+      ipcRenderer.send('refresh-menu');
+    });
 
-
-    // ── Hover state ──
     ipcRenderer.on('hover-state', (event, hovered) => {
       document.body.classList.toggle('is-hovered', hovered);
     });
 
-    // ── Initialize with empty ring ──
     updateRing();
   </script>
 </body>
-
 </html>
