@@ -54,6 +54,7 @@
     let level = 1;
     let currentXP = 0;
     let totalCommits = 0;
+    let isInitialized = false;
 
     function getMaxXP(lvl) {
       return Math.floor(BASE_XP * Math.pow(GROWTH_FACTOR, lvl - 1));
@@ -67,8 +68,10 @@
       levelEl.textContent = level;
 
 
-      // Save to disk
-      ipcRenderer.send('save-data', { level, currentXP, totalCommits });
+      // Save to disk only if loaded
+      if (isInitialized) {
+        ipcRenderer.send('save-data', { level, currentXP, totalCommits });
+      }
     }
 
     // ── Add XP with level-up logic ──
@@ -96,6 +99,7 @@
       level = data.level || 1;
       currentXP = data.currentXP || 0;
       totalCommits = data.totalCommits || 0;
+      isInitialized = true;
       updateRing();
     });
 
