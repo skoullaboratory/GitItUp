@@ -1,0 +1,128 @@
+:root {
+  --xp-from: #00e5ff;
+  --xp-to: #76ff03;
+  --xp-dark: #111318;
+  --xp-track: #1e2028;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: 'Outfit', sans-serif;
+  user-select: none;
+
+  /* Controlled by JS polling */
+  opacity: 0.15;
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.is-hovered {
+  opacity: 1;
+}
+
+/* Container */
+.xp-circle-wrapper {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  transition: filter 0.4s ease;
+}
+
+body.is-hovered .xp-circle-wrapper {
+  filter: drop-shadow(0 0 6px rgba(118, 255, 3, 0.25));
+}
+
+/* ── Progress Ring (SVG) ── */
+.xp-ring-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.xp-ring-track {
+  fill: none;
+  stroke: var(--xp-track);
+  stroke-width: 13;
+}
+
+.xp-ring-progress {
+  fill: none;
+  stroke: url(#xp-gradient);
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-dasharray: 188.5;
+  stroke-dashoffset: 188.5; /* Starts empty, JS controls it */
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Level Badge ── */
+.xp-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.xp-level-badge {
+  font-size: 26px;
+  font-weight: 700;
+  color: #cff5d1;
+  letter-spacing: -0.5px;
+  -webkit-text-stroke: 4px var(--xp-track);
+  paint-order: stroke fill;
+  text-shadow: 0 0 12px rgba(118, 255, 3, 0.3);
+}
+
+/* ── XP Slider (test control) ── */
+.xp-slider-wrapper {
+  margin-top: 6px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+body.is-hovered .xp-slider-wrapper {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.xp-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 80px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--xp-track);
+  outline: none;
+  cursor: pointer;
+}
+
+.xp-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--xp-to);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 4px rgba(118, 255, 3, 0.4);
+}

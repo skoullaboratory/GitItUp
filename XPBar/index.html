@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XP Bar — Git Gamification</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div class="xp-circle-wrapper">
+    <!-- SVG Progress Ring -->
+    <svg class="xp-ring-svg" viewBox="0 0 80 80">
+      <defs>
+        <linearGradient id="xp-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#00e5ff" />
+          <stop offset="100%" stop-color="#76ff03" />
+        </linearGradient>
+      </defs>
+      <!-- Background track -->
+      <circle class="xp-ring-track" cx="40" cy="40" r="30" />
+      <!-- Progress arc -->
+      <circle id="xp-progress" class="xp-ring-progress" cx="40" cy="40" r="30" />
+    </svg>
+
+    <!-- Level badge in the center -->
+    <div class="xp-center">
+      <div id="xp-level" class="xp-level-badge">1</div>
+    </div>
+  </div>
+
+  <!-- XP Slider (debug/testing) — only visible on hover -->
+  <div class="xp-slider-wrapper">
+    <input type="range" id="xp-slider" class="xp-slider" min="0" max="100" value="0" />
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    // ── Constants ──
+    const CIRCUMFERENCE = 2 * Math.PI * 30; // ≈ 188.5
+    const BASE_XP = 100;
+    const XP_PER_COMMIT = 25;
+    const GROWTH_FACTOR = 1.5;
+
+    // ── DOM Elements ──
+    const progressEl = document.getElementById('xp-progress');
+    const levelEl = document.getElementById('xp-level');
+    const slider = document.getElementById('xp-slider');
+
+    // ── State ──
+    let level = 1;
+    let currentXP = 0;
+    let totalCommits = 0;
+
+    function getMaxXP(lvl) {
+      return Math.floor(BASE_XP * Math.pow(GROWTH_FACTOR, lvl - 1));
+    }
+
+    function updateRing() {
+      const maxXP = getMaxXP(level);
+      const progress = Math.min(currentXP / maxXP, 1);
+      const offset = CIRCUMFERENCE * (1 - progress);
+      progressEl.style.strokeDashoffset = offset;
+      levelEl.textContent = level;
+      slider.max = maxXP;
+      slider.value = currentXP;
+
+      // Save to disk
+      ipcRenderer.send('save-data', { level, currentXP, totalCommits });
+    }
+
+    // ── Add XP with level-up logic ──
+    function addXP(amount) {
+      currentXP += amount;
+      let maxXP = getMaxXP(level);
+
+      while (currentXP >= maxXP) {
+        currentXP -= maxXP;
+        level++;
+        maxXP = getMaxXP(level);
+      }
+
+      updateRing();
+    }
+
+    // ── Git Commit Event ──
+    ipcRenderer.on('git-commit', () => {
+      totalCommits++;
+      addXP(XP_PER_COMMIT);
+    });
+
+    // ── Load saved data ──
+    ipcRenderer.on('init-data', (event, data) => {
+      level = data.level || 1;
+      currentXP = data.currentXP || 0;
+      totalCommits = data.totalCommits || 0;
+      updateRing();
+    });
+
+    // ── Slider for manual testing ──
+    slider.addEventListener('input', (e) => {
+      currentXP = parseInt(e.target.value, 10);
+      const maxXP = getMaxXP(level);
+
+      if (currentXP >= maxXP) {
+        currentXP = 0;
+        level++;
+      }
+
+      updateRing();
+    });
+
+    // ── Hover state ──
+    ipcRenderer.on('hover-state', (event, hovered) => {
+      document.body.classList.toggle('is-hovered', hovered);
+    });
+
+    // ── Initialize with empty ring ──
+    updateRing();
+  </script>
+</body>
+
+</html>

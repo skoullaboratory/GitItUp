@@ -1,0 +1,15 @@
+{
+  "name": "xp-bar",
+  "version": "1.0.0",
+  "description": "A decorative XP bar for your desktop.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^30.0.0"
+  }
+}
