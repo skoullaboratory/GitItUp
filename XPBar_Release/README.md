@@ -23,6 +23,7 @@ A lightweight desktop overlay that gamifies your coding workflow. Every Git comm
 ## 🚀 Setup
 
 ### 1. Install Dependencies
+Open a terminal in the `App` folder and run:
 ```bash
 npm install
 ```
@@ -80,17 +81,19 @@ Edit the constants in `main.js` and `index.html` to customize the progression sp
 
 ```text
 XPBar_Release/
-├── main.js             # Electron main & HTTP server
-├── index.html          # UI and XP logic
-├── style.css           # Styling & animations
-├── icon.png            # App & Tray icon
-├── assets/
-│   └── icon.ico        # Official Windows ICO for shortcut
-├── hooks/
-│   └── post-commit     # The Git hook script
+├── README.md           # Instructions
 ├── instalar.bat        # Desktop shortcut installer (One-click)
 ├── install-hook.bat    # Global Git hook installer
-└── package.json        # Dependencies & scripts
+└── App/                # Internal application files
+    ├── main.js         # Electron main 
+    ├── index.html      # UI and XP logic
+    ├── style.css       # Styling & animations
+    ├── icon.png        # App & Tray icon
+    ├── assets/
+    │   └── icon.ico    # Shortcut icon
+    ├── hooks/
+    │   └── post-commit # The Git hook script
+    └── package.json    # Dependencies
 ```
 
 ---

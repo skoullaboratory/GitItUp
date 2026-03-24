@@ -21,7 +21,7 @@ if not exist "%HOOKS_DIR%" (
 )
 
 REM Copy the post-commit hook
-copy /Y "%~dp0hooks\post-commit" "%HOOKS_DIR%\post-commit" > nul
+copy /Y "%~dp0App\hooks\post-commit" "%HOOKS_DIR%\post-commit" > nul
 echo  [OK] Installed post-commit hook
 
 REM Configure git to use global hooks

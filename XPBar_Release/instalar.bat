@@ -7,8 +7,8 @@ echo.
 echo  Preparing GitItUp environment...
 echo.
 
-set "ICON_PATH=%~dp0assets\icon.ico"
-set "WORK_DIR=%~dp0"
+set "ICON_PATH=%~dp0App\assets\icon.ico"
+set "WORK_DIR=%~dp0App"
 set "DESKTOP_PATH=%USERPROFILE%\Desktop\GitItUp.lnk"
 
 echo  Creating invisible desktop shortcut...
