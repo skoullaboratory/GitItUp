@@ -105,7 +105,7 @@ function buildTrayMenu() {
   const pos = currentData.position || 'bottom-right';
 
   const template = [
-    { label: 'Git XP Bar v1.1', enabled: false },
+    { label: `GitItUp v${app.getVersion()}`, enabled: false },
     { type: 'separator' },
     {
       label: 'Cambiar Estilo',
@@ -153,7 +153,7 @@ function createWindow() {
     (fs.existsSync(iconPkgPath) ? nativeImage.createFromPath(iconPkgPath) : nativeImage.createEmpty());
 
   tray = new Tray(trayIcon.isEmpty() ? nativeImage.createFromBuffer(Buffer.alloc(256)) : trayIcon.resize({ width: 16, height: 16 }));
-  tray.setToolTip('Git XP Bar');
+  tray.setToolTip('GitItUp');
 
   // Update menu whenever it might change
   const refreshMenu = () => tray.setContextMenu(buildTrayMenu());

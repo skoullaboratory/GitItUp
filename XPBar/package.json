@@ -1,15 +1,15 @@
 {
-  "name": "xp-bar",
-  "version": "1.0.0",
-  "description": "A decorative XP bar for your desktop.",
+  "name": "git-it-up",
+  "version": "0.0.1",
+  "description": "A progress-tracking desktop overlay for developers.",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "build": "electron-builder -w"
   },
   "build": {
-    "appId": "com.github.gititup.xpbar",
-    "productName": "Git XP Bar",
+    "appId": "com.github.gititup.app",
+    "productName": "GitItUp",
     "directories": {
       "output": "dist"
     },

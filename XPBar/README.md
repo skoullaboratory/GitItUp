@@ -1,4 +1,4 @@
-# 🎮 XP Bar — Git Gamification (v1.1)
+# 🎮 GitItUp — Git Gamification (v0.0.1)
 
 ![GitItUp Hero](../Resources/hero.png)
 

@@ -6,7 +6,7 @@
 
 ---
 
-## ✨ Features (v1.1)
+## ✨ Features (v0.0.1)
 
 - **🔄 Dual Layouts** — Choose between a minimalist **Circular Ring** or a classic **Horizontal XP Bar**.
 - **📍 Dynamic Positioning** — Place it anywhere: top-left, top-right, bottom-left, or bottom-right.
