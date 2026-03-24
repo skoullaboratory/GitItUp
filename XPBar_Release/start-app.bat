@@ -1,11 +1,24 @@
 @echo off
 REM ──────────────────────────────────────────────
-REM  GitItUp — Quick Start (Development Mode)
-REM ──────────────────────────────────────────────
-REM  This script starts the XP Bar without compiling
-REM  to avoid Windows Smart App Control blocks.
+REM  GitItUp — Debug Launcher (Force Open)
 REM ──────────────────────────────────────────────
 
-echo  Launching GitItUp...
-cd /d "%~dp0"
-npm start
+echo.
+echo  Checking environment...
+echo.
+
+if not exist "%~dp0App" (
+    echo  [ERROR] Folder "App" not found in %~dp0
+    pause
+    exit /b
+)
+
+cd /d "%~dp0App"
+echo  Current directory: %CD%
+echo.
+
+echo  Attempting to run: npm start
+echo.
+
+REM Using cmd /k to keep the window open even if the process crashes or terminates
+cmd /k "npm start"

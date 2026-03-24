@@ -1,103 +1,75 @@
 # 🎮 GitItUp — Git Gamification (v0.0.1)
 
-![GitItUp Hero](../Resources/hero.png)
-
-A lightweight desktop overlay that gamifies your coding workflow. Every Git commit earns you XP and levels you up!
+A minimalist, high-aesthetic desktop overlay that gamifies your Git workflow. Earn XP and level up with every commit you make!
 
 ---
 
 ## ✨ Features
 
-- **🔄 Shapes & Layouts** — Choose from a minimalist circular ring or a classic horizontal bar.
-- **🎨 Visual Theme Picker** — Select from 10 premium color gradients using a rectangular visual selector.
-- **🎚️ Transparency Control** — Adjust the default idle opacity with a slider directly in the settings.
-- **📍 Multi-Positioning** — Snap to any screen corner or edge via the tray menu.
-- **Git Integration** — Automatically gains XP on every successful `git commit`.
-- **🕹️ Leveling System** — XP requirements increase with each level (×1.5 scaling).
-- **Persistent Progress** — Your level, XP, and layout settings are saved between sessions.
-- **👁️ Hover Reveal** — Translucent by default, fully visible and clickable on mouse hover.
-- **📥 System Tray** — Control the app, change layouts, and manage visibility from the tray.
+- **🔄 Dual Layouts** — Minimalist circular ring o barra horizontal clásica.
+- **🎨 Visual Themes** — 10 degradados premium para tu escritorio.
+- **🎚️ Transparencia** — Slider para ajustar la opacidad en reposo.
+- **📍 Snap Zones** — Se ancla a cualquier esquina de la pantalla.
+- **Git Integration** — Seguimiento en tiempo real de XP mediante Git hooks.
+- **🕹️ Subida de Nivel** — Los requisitos de XP crecen con cada nivel (x1.5).
+- **Persistent Progress** — Tus estadísticas se guardan automáticamente.
 
 ---
 
-## 🚀 Setup
-
-### 1. Install Dependencies
-Open a terminal in the `App` folder and run:
-```bash
-npm install
-```
-
-### 2. Install the App (Shortcut)
-Run the installer to create a desktop shortcut with the official icon and silent startup:
-```powershell
-.\instalar.bat
-```
-
-### 3. Install the Global Git Hook
-Run the hook installer to enable XP tracking for **all** your Git repositories:
-```powershell
-.\install-hook.bat
-```
-
-### 4. Start the App
-Simply double-click the **GitItUp** icon on your Desktop.
-(Or launch via `npm start` in the terminal).
+## 🚀 Requisitos
+Asegúrate de tener instalado **[Node.js](https://nodejs.org/)** (v16+) y **Git**. 
 
 ---
 
-## ⚙️ Configuration
+## 📥 Instalación (MUY IMPORTANTE)
 
-Edit the constants in `main.js` and `index.html` to customize the progression speed.
+Para que el programa funcione, sigue estos pasos exactamente:
 
-| Constant | Default | Description |
+1.  **Entra** en la carpeta `XPBar_Release`.
+2.  Haz doble clic en **`instalar.bat`**. 
+    *   **NO cierres la ventana negra**. Se pondrá a descargar las librerías necesarias.
+    *   Tardará unos **40-60 segundos** en terminar.
+    *   Cuando salga el mensaje de **"[OK] Shortcut created"**, ya puedes cerrar la ventana.
+3.  Haz doble clic en **`install-hook.bat`**.
+    *   *Esto activa el XP para todos tus repositorios de Git.*
+
+---
+
+## 🕹️ Cómo usarlo
+
+1.  Abre el icono de **GitItUp** en tu escritorio.
+2.  **Configura tu estilo**: Haz clic derecho en el icono del engranaje (⚙️) que aparece al pasar el ratón para cambiar el color o la transparencia.
+3.  **Ganar XP**: Simplemente haz un `git commit` en cualquier proyecto. Verás cómo sube la barra en tiempo real.
+4.  **Bandeja del Sistema**: Usa el icono de la bandeja (al lado de la hora) para mover la barra de esquina o salir.
+
+---
+
+## 🔧 Configuración Técnica
+
+Si quieres ajustar la velocidad de subida, edita los valores en `/App/main.js`:
+
+| Constante | Default | Descripción |
 |---|---|---|
-| `BASE_XP` | `100` | XP needed for level 1 → 2 |
-| `XP_PER_COMMIT` | `25` | XP earned per commit |
-| `GROWTH_FACTOR` | `1.5` | XP multiplier per level |
-
-### Current Level Curve:
-| Level | XP Required |
-|---|---|
-| 1 → 2 | 100 |
-| 2 → 3 | 150 |
-| 3 → 4 | 225 |
-| 4 → 5 | 338 |
+| `BASE_XP` | `100` | XP para subir del nivel 1 al 2 |
+| `XP_PER_COMMIT` | `25` | XP que ganas por cada commit |
+| `GROWTH_FACTOR` | `1.5` | Multiplicador de dificultad por nivel |
 
 ---
 
-## 🔧 Technical Overview
-
-1.  **Main Process**: Electrons `main.js` runs a tiny HTTP server on `localhost:31415`.
-2.  **Notification Hub**: The global Git hook sends a `POST /commit` signal after every commit.
-3.  **UI Updates**: The app receives the signal, appends XP, triggers a CSS animation, and saves data to `xp-data.json`.
-4.  **Local API**:
-    - `POST /commit`: Add 25 XP.
-    - `GET /status`: View current level, total commits, and current XP.
-
----
-
-## 📁 Project Structure
+## 📁 Estructura del Proyecto
 
 ```text
 XPBar_Release/
-├── README.md           # Instructions
-├── instalar.bat        # Desktop shortcut installer (One-click)
-├── install-hook.bat    # Global Git hook installer
-└── App/                # Internal application files
-    ├── main.js         # Electron main 
-    ├── index.html      # UI and XP logic
-    ├── style.css       # Styling & animations
-    ├── icon.png        # App & Tray icon
-    ├── assets/
-    │   └── icon.ico    # Shortcut icon
-    ├── hooks/
-    │   └── post-commit # The Git hook script
-    └── package.json    # Dependencies
+├── README.md           # Estas instrucciones
+├── instalar.bat        # INSTALADOR (Único clic - descarga todo)
+├── install-hook.bat    # ACTIVADOR de XP
+└── App/                # Código interno (no borrar)
+    ├── main.js         # Servidor y Electron
+    ├── index.html/css  # Interfaz y Estilos
+    └── assets/         # Iconos oficiales
 ```
 
 ---
 
 ## ⚖️ License
-
-Distributed under the ISC License. See `LICENSE` for more information.
+Distributed under the ISC License.
