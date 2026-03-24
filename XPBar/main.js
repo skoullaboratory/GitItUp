@@ -2,6 +2,7 @@ const { app, BrowserWindow, screen, ipcMain, Tray, Menu, nativeImage } = require
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { exec } = require('child_process');
 
 app.disableHardwareAcceleration();
 
@@ -42,6 +43,32 @@ const GROWTH_FACTOR = 1.5;
 
 function getMaxXP(level) {
   return Math.floor(BASE_XP * Math.pow(GROWTH_FACTOR, level - 1));
+}
+
+// ── Git Integration (Self-Installing) ──
+function autoInstallGitIntegration() {
+  const hooksDir = path.join(app.getPath('userData'), 'git-hooks');
+  const postCommitPath = path.join(hooksDir, 'post-commit');
+  const hookContent = `#!/bin/sh\ncurl -s -X POST http://127.0.0.1:31415/commit > /dev/null 2>&1 || true\n`;
+
+  try {
+    if (!fs.existsSync(hooksDir)) {
+      fs.mkdirSync(hooksDir, { recursive: true });
+    }
+    fs.writeFileSync(postCommitPath, hookContent);
+    
+    // Configure Git globally to use this hooks directory (forward slashes for path safety)
+    const normalizedPath = hooksDir.replace(/\\/g, '/');
+    exec(`git config --global core.hooksPath "${normalizedPath}"`, (err) => {
+      if (err) {
+        console.error('Git config error:', err);
+      } else {
+        console.log('GitItUp: Global integration installed successfully.');
+      }
+    });
+  } catch (err) {
+    console.error('Hook installation error:', err);
+  }
 }
 
 // ── Window & Layout ──
@@ -241,7 +268,10 @@ if (!gotLock) {
   app.quit();
 } else {
   app.on('second-instance', () => { if (win) win.show(); });
-  app.on('ready', () => setTimeout(createWindow, 400));
+  app.on('ready', () => {
+    autoInstallGitIntegration(); // Silently install integration on startup
+    setTimeout(createWindow, 400);
+  });
   app.on('window-all-closed', () => {
     server.close();
     if (process.platform !== 'darwin') app.quit();
