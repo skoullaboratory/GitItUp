@@ -22,7 +22,9 @@ function loadData() {
     currentXP: 0,
     totalCommits: 0,
     shape: 'circular',
-    position: 'bottom-right'
+    position: 'bottom-right',
+    theme: 'cyan-green',
+    opacity: 0.15
   };
 }
 
@@ -115,15 +117,47 @@ function getLayout(shape, position) {
   return { x: Math.floor(x), y: Math.floor(y), width: winWidth, height: winHeight };
 }
 
-function updateAppLayout(shape, position) {
-  currentData.shape = shape;
-  currentData.position = position;
-  saveData({ shape, position });
+function updateAppLayout(shape, position, theme) {
+  if (shape) currentData.shape = shape;
+  if (position) currentData.position = position;
+  if (theme) currentData.theme = theme;
+  
+  saveData({ shape: currentData.shape, position: currentData.position, theme: currentData.theme });
 
-  const layout = getLayout(shape, position);
+  const layout = getLayout(currentData.shape, currentData.position);
   if (win) {
     win.setBounds(layout);
-    win.webContents.send('update-style', { shape, position });
+    win.webContents.send('update-style', { 
+      shape: currentData.shape, 
+      position: currentData.position, 
+      theme: currentData.theme 
+    });
+    // Ensure window is always on top after move
+    win.setAlwaysOnTop(true, 'screen-saver', 1);
+  }
+}
+
+function expandWindow(expanded) {
+  if (!win) return;
+  const layout = getLayout(currentData.shape, currentData.position);
+  if (expanded) {
+    if (currentData.shape === 'circular') {
+      win.setBounds({
+        x: layout.x - 100,
+        y: layout.y - 250,
+        width: 300,
+        height: 350
+      });
+    } else {
+      win.setBounds({
+        x: layout.x,
+        y: layout.y - 120,
+        width: 400,
+        height: 160
+      });
+    }
+  } else {
+    win.setBounds(layout);
   }
 }
 
@@ -159,6 +193,21 @@ function buildTrayMenu() {
         }
       ]
     },
+    {
+      label: 'Temas de Color',
+      submenu: [
+        { label: 'Neon Cyan', type: 'radio', checked: currentData.theme === 'cyan-green', click: () => updateAppLayout(null, null, 'cyan-green') },
+        { label: 'Sunset Orange', type: 'radio', checked: currentData.theme === 'sunset', click: () => updateAppLayout(null, null, 'sunset') },
+        { label: 'Electric Purple', type: 'radio', checked: currentData.theme === 'purple-haze', click: () => updateAppLayout(null, null, 'purple-haze') },
+        { label: 'Royal Gold', type: 'radio', checked: currentData.theme === 'gold', click: () => updateAppLayout(null, null, 'gold') },
+        { label: 'Forest Green', type: 'radio', checked: currentData.theme === 'forest', click: () => updateAppLayout(null, null, 'forest') },
+        { label: 'Ocean Blue', type: 'radio', checked: currentData.theme === 'ocean', click: () => updateAppLayout(null, null, 'ocean') },
+        { label: 'Cherry Blossom', type: 'radio', checked: currentData.theme === 'cherry', click: () => updateAppLayout(null, null, 'cherry') },
+        { label: 'Volcano Red', type: 'radio', checked: currentData.theme === 'volcano', click: () => updateAppLayout(null, null, 'volcano') },
+        { label: 'Cyberpunk', type: 'radio', checked: currentData.theme === 'cyberpunk', click: () => updateAppLayout(null, null, 'cyberpunk') },
+        { label: 'Monochrome', type: 'radio', checked: currentData.theme === 'silver', click: () => updateAppLayout(null, null, 'silver') }
+      ]
+    },
     { type: 'separator' },
     { label: 'Mostrar aplicación', click: () => win.show() },
     { label: 'Ocultar aplicación', click: () => win.hide() },
@@ -187,6 +236,19 @@ function createWindow() {
   refreshMenu();
   ipcMain.on('refresh-menu', refreshMenu);
 
+  ipcMain.on('update-theme', (event, theme) => {
+    updateAppLayout(null, null, theme);
+  });
+
+  ipcMain.on('expand-window', (event, expanded) => {
+    expandWindow(expanded);
+  });
+
+  ipcMain.on('update-opacity', (event, opacity) => {
+    currentData.opacity = opacity;
+    saveData({ opacity });
+  });
+
   win = new BrowserWindow({
     width: layout.width,
     height: layout.height,
@@ -212,7 +274,11 @@ function createWindow() {
 
   win.webContents.on('did-finish-load', () => {
     win.webContents.send('init-data', currentData);
-    win.webContents.send('update-style', { shape: currentData.shape, position: currentData.position });
+    win.webContents.send('update-style', { 
+      shape: currentData.shape, 
+      position: currentData.position, 
+      theme: currentData.theme 
+    });
   });
 
   // Polling for hover detection (adapted for dynamic bounds)

@@ -17,8 +17,8 @@
     <svg class="xp-ring-svg" viewBox="0 0 80 80">
       <defs>
         <linearGradient id="xp-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#00e5ff" />
-          <stop offset="100%" stop-color="#76ff03" />
+          <stop offset="0%" stop-color="var(--xp-color-1, #00e5ff)" />
+          <stop offset="100%" stop-color="var(--xp-color-2, #76ff03)" />
         </linearGradient>
       </defs>
       <circle class="xp-ring-track" cx="40" cy="40" r="30" />
@@ -35,6 +35,23 @@
     <div class="xp-bar-track">
       <div class="xp-bar-fill" id="xp-bar-fill"></div>
     </div>
+  </div>
+
+  <!-- 3. Theme Selector Overlay -->
+  <div class="theme-selector-container" id="theme-selector">
+    <div class="settings-title">Temas</div>
+    <div class="theme-list" id="theme-list"></div>
+    <div class="settings-title">Transparencia</div>
+    <div class="transparency-control">
+      <input type="range" id="opacity-slider" min="0.05" max="0.5" step="0.01" value="0.15">
+    </div>
+  </div>
+
+  <div class="settings-trigger" id="settings-trigger">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
+      <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
+    </svg>
   </div>
 
   <div id="particles"></div>
@@ -56,6 +73,10 @@
     const circleWrapper = document.querySelector('.xp-circle-wrapper');
     const horizontalWrapper = document.querySelector('.xp-horizontal-wrapper');
     const particlesContainer = document.getElementById('particles');
+    const themeSelector = document.getElementById('theme-selector');
+    const themeList = document.getElementById('theme-list');
+    const settingsTrigger = document.getElementById('settings-trigger');
+    const opacitySlider = document.getElementById('opacity-slider');
 
     // ── State ──
     let level = 1;
@@ -63,10 +84,56 @@
     let totalCommits = 0;
     let isInitialized = false;
     let currentShape = 'circular';
+    let currentTheme = 'cyan-green';
+    let currentOpacity = 0.15;
+
+    const THEMES = {
+      'cyan-green': ['#00e5ff', '#76ff03'],
+      'sunset': ['#ff512f', '#dd2476'],
+      'purple-haze': ['#8e2de2', '#4a00e0'],
+      'gold': ['#f7971e', '#ffd200'],
+      'forest': ['#11998e', '#38ef7d'],
+      'ocean': ['#00c6ff', '#0072ff'],
+      'cherry': ['#ee9ca7', '#ffdde1'],
+      'volcano': ['#ff4b1f', '#ff9068'],
+      'cyberpunk': ['#ff00cc', '#3333ff'],
+      'silver': ['#bdc3c7', '#2c3e50']
+    };
 
     function getMaxXP(lvl) {
       return Math.floor(BASE_XP * Math.pow(GROWTH_FACTOR, lvl - 1));
     }
+
+    // ── Theme Picker Logic ──
+    function initThemes() {
+      themeList.innerHTML = '';
+      Object.keys(THEMES).forEach(key => {
+        const [c1, c2] = THEMES[key];
+        const btn = document.createElement('div');
+        btn.className = `theme-btn ${key === currentTheme ? 'active' : ''}`;
+        btn.style.background = `linear-gradient(135deg, ${c1}, ${c2})`;
+        btn.title = key.replace('-', ' ');
+        btn.onclick = () => {
+          ipcRenderer.send('update-theme', key);
+          document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        };
+        themeList.appendChild(btn);
+      });
+    }
+
+    settingsTrigger.onclick = (e) => {
+      e.stopPropagation();
+      const showing = document.body.classList.toggle('show-settings');
+      ipcRenderer.send('expand-window', showing);
+    };
+
+    opacitySlider.oninput = (e) => {
+      const val = e.target.value;
+      currentOpacity = val;
+      document.documentElement.style.setProperty('--xp-idle-opacity', val);
+      ipcRenderer.send('update-opacity', val);
+    };
 
     function updateRing() {
       const maxXP = getMaxXP(level);
@@ -170,20 +237,51 @@
       currentXP = data.currentXP || 0;
       totalCommits = data.totalCommits || 0;
       isInitialized = true;
+      
+      if (data.theme) {
+        currentTheme = data.theme;
+        const [c1, c2] = THEMES[currentTheme] || THEMES['cyan-green'];
+        document.documentElement.style.setProperty('--xp-color-1', c1);
+        document.documentElement.style.setProperty('--xp-color-2', c2);
+      }
+
+      if (data.opacity) {
+        currentOpacity = data.opacity;
+        opacitySlider.value = currentOpacity;
+        document.documentElement.style.setProperty('--xp-idle-opacity', currentOpacity);
+      }
+
       updateRing();
+      initThemes();
     });
 
-    ipcRenderer.on('update-style', (event, { shape, position }) => {
+    ipcRenderer.on('update-style', (event, { shape, position, theme }) => {
       currentShape = shape;
-      document.body.className = `mode-${shape}`;
+      if (theme) {
+        currentTheme = theme;
+        const [c1, c2] = THEMES[theme] || THEMES['cyan-green'];
+        document.documentElement.style.setProperty('--xp-color-1', c1);
+        document.documentElement.style.setProperty('--xp-color-2', c2);
+        
+        // Update active class in picker
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.title === theme.replace('-', ' '));
+        });
+      }
+      document.body.className = `mode-${shape}${document.body.classList.contains('is-hovered') ? ' is-hovered' : ''}`;
       // Tell main to refresh context menu checkmarks
       ipcRenderer.send('refresh-menu');
     });
 
     ipcRenderer.on('hover-state', (event, hovered) => {
       document.body.classList.toggle('is-hovered', hovered);
+      if (!hovered) {
+        document.body.classList.remove('show-settings');
+        ipcRenderer.send('expand-window', false);
+      }
     });
 
+    initThemes();
     updateRing();
   </script>
 </body>
