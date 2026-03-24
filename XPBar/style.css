@@ -90,39 +90,3 @@ body.is-hovered .xp-circle-wrapper {
   paint-order: stroke fill;
   text-shadow: 0 0 12px rgba(118, 255, 3, 0.3);
 }
-
-/* ── XP Slider (test control) ── */
-.xp-slider-wrapper {
-  margin-top: 6px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-
-body.is-hovered .xp-slider-wrapper {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.xp-slider {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 80px;
-  height: 4px;
-  border-radius: 2px;
-  background: var(--xp-track);
-  outline: none;
-  cursor: pointer;
-}
-
-.xp-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--xp-to);
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 0 4px rgba(118, 255, 3, 0.4);
-}

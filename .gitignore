@@ -2,3 +2,7 @@
 XPBar/.qodo
 XPBar/hooks
 XPBar/node_modules
+XPBar/package-lock.json
+XPBar/dist
+XPBar/build
+XPBar/release

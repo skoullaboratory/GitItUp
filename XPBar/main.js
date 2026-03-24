@@ -44,7 +44,7 @@ function createWindow() {
   const { width, height } = primaryDisplay.workAreaSize;
 
   const winWidth = 100;
-  const winHeight = 120;
+  const winHeight = 100;
   const winX = Math.floor(width - winWidth - 30);
   const winY = Math.floor(height - winHeight - 30);
 

@@ -33,10 +33,7 @@
     </div>
   </div>
 
-  <!-- XP Slider (debug/testing) — only visible on hover -->
-  <div class="xp-slider-wrapper">
-    <input type="range" id="xp-slider" class="xp-slider" min="0" max="100" value="0" />
-  </div>
+
 
   <script>
     const { ipcRenderer } = require('electron');
@@ -50,7 +47,7 @@
     // ── DOM Elements ──
     const progressEl = document.getElementById('xp-progress');
     const levelEl = document.getElementById('xp-level');
-    const slider = document.getElementById('xp-slider');
+
 
     // ── State ──
     let level = 1;
@@ -67,8 +64,7 @@
       const offset = CIRCUMFERENCE * (1 - progress);
       progressEl.style.strokeDashoffset = offset;
       levelEl.textContent = level;
-      slider.max = maxXP;
-      slider.value = currentXP;
+
 
       // Save to disk
       ipcRenderer.send('save-data', { level, currentXP, totalCommits });
@@ -102,18 +98,7 @@
       updateRing();
     });
 
-    // ── Slider for manual testing ──
-    slider.addEventListener('input', (e) => {
-      currentXP = parseInt(e.target.value, 10);
-      const maxXP = getMaxXP(level);
 
-      if (currentXP >= maxXP) {
-        currentXP = 0;
-        level++;
-      }
-
-      updateRing();
-    });
 
     // ── Hover state ──
     ipcRenderer.on('hover-state', (event, hovered) => {
