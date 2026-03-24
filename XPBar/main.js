@@ -19,7 +19,6 @@ function loadData() {
   return { level: 1, currentXP: 0, totalCommits: 0 };
 }
 
-
 function saveData(data) {
   try {
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));

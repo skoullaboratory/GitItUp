@@ -100,12 +100,19 @@
     }
 
     function triggerGainXPEffects() {
+      document.body.classList.add('is-animating');
       progressEl.classList.remove('xp-gain-anim');
       void progressEl.offsetWidth; // Trigger reflow
       progressEl.classList.add('xp-gain-anim');
+      
+      setTimeout(() => {
+        document.body.classList.remove('is-animating');
+      }, 800);
     }
 
     function triggerLevelUpEffects() {
+      document.body.classList.add('is-animating');
+
       // Flash the whole ring
       wrapper.classList.remove('level-up-anim');
       void wrapper.offsetWidth;
@@ -118,15 +125,19 @@
 
       // Explode particles
       triggerParticles();
+
+      setTimeout(() => {
+        document.body.classList.remove('is-animating');
+      }, 1500);
     }
 
     function triggerParticles() {
-      for (let i = 0; i < 12; i++) {
+      for (let i = 0; i < 20; i++) {
         const p = document.createElement('div');
         p.className = 'particle';
         const angle = Math.random() * Math.PI * 2;
-        const distance = 40 + Math.random() * 40;
-        const size = 3 + Math.random() * 4;
+        const distance = 40 + Math.random() * 60;
+        const size = 3 + Math.random() * 5;
         
         p.style.width = `${size}px`;
         p.style.height = `${size}px`;

@@ -28,7 +28,8 @@ body {
   transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-body.is-hovered {
+body.is-hovered,
+body.is-animating {
   opacity: 1;
 }
 
@@ -95,15 +96,15 @@ body.is-hovered .xp-circle-wrapper {
 
 /* ── Effects ── */
 .xp-gain-anim {
-  animation: xp-pulse 0.4s ease-out;
+  animation: xp-pulse 0.8s ease-out;
 }
 
 .level-up-anim {
-  animation: level-flash 0.8s ease-out;
+  animation: level-flash 1.5s ease-out;
 }
 
 .badge-pop {
-  animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: pop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 @keyframes xp-pulse {
@@ -170,7 +171,7 @@ body.is-hovered .xp-circle-wrapper {
   background: var(--xp-to);
   border-radius: 50%;
   opacity: 0;
-  animation: explode 0.8s ease-out forwards;
+  animation: explode 1.5s ease-out forwards;
 }
 
 @keyframes explode {
