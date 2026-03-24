@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitItUp — Git Gamification</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="mode-circular">
+  <div class="app-container">
+  <!-- 1. Circular Mode -->
+  <div class="xp-circle-wrapper">
+    <svg class="xp-ring-svg" viewBox="0 0 80 80">
+      <defs>
+        <linearGradient id="xp-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="var(--xp-color-1, #00e5ff)" />
+          <stop offset="100%" stop-color="var(--xp-color-2, #76ff03)" />
+        </linearGradient>
+      </defs>
+      <circle class="xp-ring-track" cx="40" cy="40" r="30" />
+      <circle id="xp-progress" class="xp-ring-progress" cx="40" cy="40" r="30" />
+    </svg>
+    <div class="xp-center">
+      <div id="xp-level" class="xp-level-badge">1</div>
+    </div>
+  </div>
+
+  <!-- 2. Horizontal Mode -->
+  <div class="xp-horizontal-wrapper">
+    <div class="xp-bar-level" id="xp-bar-level">1</div>
+    <div class="xp-bar-track">
+      <div class="xp-bar-fill" id="xp-bar-fill"></div>
+    </div>
+  </div>
+
+  <!-- 3. Theme Selector Overlay -->
+  <div class="theme-selector-container" id="theme-selector">
+    <div class="settings-title">Temas</div>
+    <div class="theme-list" id="theme-list"></div>
+    <div class="settings-title">Transparencia</div>
+    <div class="transparency-control">
+      <input type="range" id="opacity-slider" min="0.05" max="0.5" step="0.01" value="0.15">
+    </div>
+  </div>
+
+  <div class="settings-trigger" id="settings-trigger">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
+      <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
+    </svg>
+  </div>
+  </div>
+  <div id="particles"></div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    // ── Constants ──
+    const CIRCUMFERENCE = 2 * Math.PI * 30;
+    const BASE_XP = 100;
+    const XP_PER_COMMIT = 25;
+    const GROWTH_FACTOR = 1.5;
+
+    // ── DOM Elements ──
+    const progressEl = document.getElementById('xp-progress');
+    const levelEl = document.getElementById('xp-level');
+    const barFillEl = document.getElementById('xp-bar-fill');
+    const barLevelEl = document.getElementById('xp-bar-level');
+    const circleWrapper = document.querySelector('.xp-circle-wrapper');
+    const horizontalWrapper = document.querySelector('.xp-horizontal-wrapper');
+    const particlesContainer = document.getElementById('particles');
+    const themeSelector = document.getElementById('theme-selector');
+    const themeList = document.getElementById('theme-list');
+    const settingsTrigger = document.getElementById('settings-trigger');
+    const opacitySlider = document.getElementById('opacity-slider');
+
+    // ── State ──
+    let level = 1;
+    let currentXP = 0;
+    let totalCommits = 0;
+    let isInitialized = false;
+    let currentShape = 'circular';
+    let currentTheme = 'cyan-green';
+    let currentOpacity = 0.15;
+
+    const THEMES = {
+      'cyan-green': ['#00e5ff', '#76ff03'],
+      'sunset': ['#ff512f', '#dd2476'],
+      'purple-haze': ['#8e2de2', '#4a00e0'],
+      'gold': ['#f7971e', '#ffd200'],
+      'forest': ['#11998e', '#38ef7d'],
+      'ocean': ['#00c6ff', '#0072ff'],
+      'cherry': ['#ee9ca7', '#ffdde1'],
+      'volcano': ['#ff4b1f', '#ff9068'],
+      'cyberpunk': ['#ff00cc', '#3333ff'],
+      'silver': ['#bdc3c7', '#2c3e50']
+    };
+
+    function getMaxXP(lvl) {
+      return Math.floor(BASE_XP * Math.pow(GROWTH_FACTOR, lvl - 1));
+    }
+
+    // ── Theme Picker Logic ──
+    function initThemes() {
+      themeList.innerHTML = '';
+      Object.keys(THEMES).forEach(key => {
+        const [c1, c2] = THEMES[key];
+        const btn = document.createElement('div');
+        btn.className = `theme-btn ${key === currentTheme ? 'active' : ''}`;
+        btn.style.background = `linear-gradient(135deg, ${c1}, ${c2})`;
+        btn.title = key.replace('-', ' ');
+        btn.onclick = () => {
+          ipcRenderer.send('update-theme', key);
+          document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        };
+        themeList.appendChild(btn);
+      });
+    }
+
+    settingsTrigger.onclick = (e) => {
+      e.stopPropagation();
+      const showing = document.body.classList.toggle('show-settings');
+      ipcRenderer.send('expand-window', showing);
+    };
+
+    opacitySlider.oninput = (e) => {
+      const val = e.target.value;
+      currentOpacity = val;
+      document.documentElement.style.setProperty('--xp-idle-opacity', val);
+      ipcRenderer.send('update-opacity', val);
+    };
+
+    function updateRing() {
+      const maxXP = getMaxXP(level);
+      const progress = Math.min(currentXP / maxXP, 1);
+      
+      // Update Circle
+      const offset = CIRCUMFERENCE * (1 - progress);
+      progressEl.style.strokeDashoffset = offset;
+      levelEl.textContent = level;
+
+      // Update Bar
+      barFillEl.style.width = `${progress * 100}%`;
+      barLevelEl.textContent = level;
+
+      if (isInitialized) {
+        ipcRenderer.send('save-data', { level, currentXP, totalCommits });
+      }
+    }
+
+    function addXP(amount) {
+      currentXP += amount;
+      let maxXP = getMaxXP(level);
+      let levelsGained = 0;
+
+      while (currentXP >= maxXP) {
+        currentXP -= maxXP;
+        level++;
+        levelsGained++;
+        maxXP = getMaxXP(level);
+      }
+
+      if (levelsGained > 0) {
+        triggerLevelUpEffects();
+      } else {
+        triggerGainXPEffects();
+      }
+
+      updateRing();
+    }
+
+    function triggerGainXPEffects() {
+      document.body.classList.add('is-animating');
+      const activeElement = currentShape === 'circular' ? progressEl : barFillEl;
+      
+      activeElement.classList.remove('xp-gain-anim');
+      void activeElement.offsetWidth;
+      activeElement.classList.add('xp-gain-anim');
+      
+      setTimeout(() => document.body.classList.remove('is-animating'), 800);
+    }
+
+    function triggerLevelUpEffects() {
+      document.body.classList.add('is-animating');
+      const container = currentShape === 'circular' ? circleWrapper : horizontalWrapper;
+      const levelBadge = currentShape === 'circular' ? levelEl : barLevelEl;
+
+      container.classList.remove('level-up-anim');
+      void container.offsetWidth;
+      container.classList.add('level-up-anim');
+
+      levelBadge.classList.remove('badge-pop');
+      void levelBadge.offsetWidth;
+      levelBadge.classList.add('badge-pop');
+
+      triggerParticles();
+      setTimeout(() => document.body.classList.remove('is-animating'), 1500);
+    }
+
+    function triggerParticles() {
+      const container = currentShape === 'circular' ? circleWrapper : horizontalWrapper;
+      // Center particles in the container
+      const rect = container.getBoundingClientRect();
+      particlesContainer.style.left = `${rect.left + rect.width / 2}px`;
+      particlesContainer.style.top = `${rect.top + rect.height / 2}px`;
+
+      const count = currentShape === 'circular' ? 20 : 30;
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 40 + Math.random() * 60;
+        const size = 3 + Math.random() * 5;
+        
+        p.style.width = `${size}px`;
+        p.style.height = `${size}px`;
+        p.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
+        p.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
+        
+        particlesContainer.appendChild(p);
+        setTimeout(() => p.remove(), 1500);
+      }
+    }
+
+    ipcRenderer.on('git-commit', () => {
+      totalCommits++;
+      addXP(XP_PER_COMMIT);
+    });
+
+    ipcRenderer.on('init-data', (event, data) => {
+      level = data.level || 1;
+      currentXP = data.currentXP || 0;
+      totalCommits = data.totalCommits || 0;
+      isInitialized = true;
+      
+      if (data.theme) {
+        currentTheme = data.theme;
+        const [c1, c2] = THEMES[currentTheme] || THEMES['cyan-green'];
+        document.documentElement.style.setProperty('--xp-color-1', c1);
+        document.documentElement.style.setProperty('--xp-color-2', c2);
+      }
+
+      if (data.opacity) {
+        currentOpacity = data.opacity;
+        opacitySlider.value = currentOpacity;
+        document.documentElement.style.setProperty('--xp-idle-opacity', currentOpacity);
+      }
+
+      updateRing();
+      initThemes();
+    });
+
+    ipcRenderer.on('update-style', (event, { shape, position, theme }) => {
+      currentShape = shape;
+      if (theme) {
+        currentTheme = theme;
+        const [c1, c2] = THEMES[theme] || THEMES['cyan-green'];
+        document.documentElement.style.setProperty('--xp-color-1', c1);
+        document.documentElement.style.setProperty('--xp-color-2', c2);
+        
+        // Update active class in picker
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.title === theme.replace('-', ' '));
+        });
+      }
+      document.body.className = `mode-${shape}${document.body.classList.contains('is-hovered') ? ' is-hovered' : ''}`;
+      // Tell main to refresh context menu checkmarks
+      ipcRenderer.send('refresh-menu');
+    });
+
+    ipcRenderer.on('hover-state', (event, hovered) => {
+      document.body.classList.toggle('is-hovered', hovered);
+      if (!hovered) {
+        document.body.classList.remove('show-settings');
+        ipcRenderer.send('expand-window', false);
+      }
+    });
+
+    initThemes();
+    updateRing();
+  </script>
+</body>
+</html>
