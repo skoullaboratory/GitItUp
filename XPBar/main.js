@@ -1,4 +1,4 @@
-const { app, BrowserWindow, screen, ipcMain } = require('electron');
+const { app, BrowserWindow, screen, ipcMain, Tray, Menu, nativeImage } = require('electron');
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -38,10 +38,38 @@ function getMaxXP(level) {
 
 // ── Window ──
 let win = null;
+// ── Tray ──
+let tray = null;
 
 function createWindow() {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
+
+  // Create Tray Icon — resolve path for both dev and packaged
+  let trayIcon;
+  const iconDevPath = path.join(__dirname, 'icon.png');
+  const iconPkgPath = path.join(process.resourcesPath, 'icon.png');
+
+  if (fs.existsSync(iconDevPath)) {
+    trayIcon = nativeImage.createFromPath(iconDevPath);
+  } else if (fs.existsSync(iconPkgPath)) {
+    trayIcon = nativeImage.createFromPath(iconPkgPath);
+  } else {
+    // Fallback: create a tiny green square icon
+    trayIcon = nativeImage.createEmpty();
+  }
+
+  tray = new Tray(trayIcon.isEmpty() ? nativeImage.createFromBuffer(Buffer.alloc(256)) : trayIcon.resize({ width: 16, height: 16 }));
+  const contextMenu = Menu.buildFromTemplate([
+    { label: 'Git XP Bar v1.0', enabled: false },
+    { type: 'separator' },
+    { label: 'Mostrar aplicación', click: () => win.show() },
+    { label: 'Ocultar aplicación', click: () => win.hide() },
+    { type: 'separator' },
+    { label: 'Salir', click: () => app.quit() }
+  ]);
+  tray.setToolTip('Git XP Bar');
+  tray.setContextMenu(contextMenu);
 
   const winWidth = 100;
   const winHeight = 100;
@@ -59,7 +87,7 @@ function createWindow() {
     focusable: false,
     resizable: false,
     hasShadow: false,
-    skipTaskbar: true,
+    skipTaskbar: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
@@ -133,9 +161,31 @@ server.listen(PORT, '127.0.0.1', () => {
   console.log(`XP Bar listening on http://127.0.0.1:${PORT}`);
 });
 
-// ── App Lifecycle ──
-app.on('ready', () => setTimeout(createWindow, 400));
-app.on('window-all-closed', () => {
-  server.close();
-  if (process.platform !== 'darwin') app.quit();
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.log('XP Bar is already running on port ' + PORT);
+    app.quit();
+  }
 });
+
+// ── Single Instance Lock ──
+const gotLock = app.requestSingleInstanceLock();
+
+if (!gotLock) {
+  // Another instance is already running — quit this one
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    // If a second instance is launched, show the existing window
+    if (win) {
+      win.show();
+    }
+  });
+
+  // ── App Lifecycle ──
+  app.on('ready', () => setTimeout(createWindow, 400));
+  app.on('window-all-closed', () => {
+    server.close();
+    if (process.platform !== 'darwin') app.quit();
+  });
+}
