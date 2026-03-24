@@ -1,0 +1,6 @@
+#!/bin/sh
+# Git post-commit hook — XP Bar Gamification
+# Sends a notification to the XP Bar app on every commit
+
+# Silently try to notify the XP Bar (ignore errors if app is not running)
+curl -s -X POST http://127.0.0.1:31415/commit > /dev/null 2>&1 || true

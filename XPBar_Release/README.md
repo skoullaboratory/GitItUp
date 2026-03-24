@@ -9,11 +9,13 @@ A lightweight desktop overlay that gamifies your coding workflow. Every Git comm
 ## ✨ Features
 
 - **🔄 Shapes & Layouts** — Choose from a minimalist circular ring or a classic horizontal bar.
+- **🎨 Visual Theme Picker** — Select from 10 premium color gradients using a rectangular visual selector.
+- **🎚️ Transparency Control** — Adjust the default idle opacity with a slider directly in the settings.
 - **📍 Multi-Positioning** — Snap to any screen corner or edge via the tray menu.
 - **Git Integration** — Automatically gains XP on every successful `git commit`.
 - **🕹️ Leveling System** — XP requirements increase with each level (×1.5 scaling).
 - **Persistent Progress** — Your level, XP, and layout settings are saved between sessions.
-- **👁️ Hover Reveal** — Translucent by default (level 0.1), fully visible and clickable (level 1.0) on mouse hover.
+- **👁️ Hover Reveal** — Translucent by default, fully visible and clickable on mouse hover.
 - **📥 System Tray** — Control the app, change layouts, and manage visibility from the tray.
 
 ---
@@ -25,24 +27,21 @@ A lightweight desktop overlay that gamifies your coding workflow. Every Git comm
 npm install
 ```
 
-### 2. Start the App
-```bash
-npm start
+### 2. Install the App (Shortcut)
+Run the installer to create a desktop shortcut with the official icon and silent startup:
+```powershell
+.\instalar.bat
 ```
 
 ### 3. Install the Global Git Hook
-Run the installer script to enable XP tracking for **all** your Git repositories.
-
-**Windows:**
+Run the hook installer to enable XP tracking for **all** your Git repositories:
 ```powershell
 .\install-hook.bat
 ```
 
-**Linux/Mac (Placeholder):**
-```bash
-# Ensure you have git installed and running.
-# Soon: ./install-hook.sh
-```
+### 4. Start the App
+Simply double-click the **GitItUp** icon on your Desktop.
+(Or launch via `npm start` in the terminal).
 
 ---
 
@@ -80,14 +79,17 @@ Edit the constants in `main.js` and `index.html` to customize the progression sp
 ## 📁 Project Structure
 
 ```text
-XPBar/
+XPBar_Release/
 ├── main.js             # Electron main & HTTP server
 ├── index.html          # UI and XP logic
 ├── style.css           # Styling & animations
 ├── icon.png            # App & Tray icon
+├── assets/
+│   └── icon.ico        # Official Windows ICO for shortcut
 ├── hooks/
 │   └── post-commit     # The Git hook script
-├── install-hook.bat    # Windows hook installer
+├── instalar.bat        # Desktop shortcut installer (One-click)
+├── install-hook.bat    # Global Git hook installer
 └── package.json        # Dependencies & scripts
 ```
 
