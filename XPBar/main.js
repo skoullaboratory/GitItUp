@@ -16,9 +16,9 @@ function loadData() {
   } catch (e) {
     console.error('Error loading XP data:', e);
   }
-  return { 
-    level: 1, 
-    currentXP: 0, 
+  return {
+    level: 1,
+    currentXP: 0,
     totalCommits: 0,
     shape: 'circular',
     position: 'bottom-right'
@@ -59,7 +59,7 @@ function getLayout(shape, position) {
   if (shape === 'circular') {
     winWidth = 100;
     winHeight = 100;
-    
+
     if (position === 'top-left') {
       x = margin;
       y = margin;
@@ -77,7 +77,7 @@ function getLayout(shape, position) {
     winWidth = 400;
     winHeight = 40;
     x = Math.floor((width - winWidth) / 2);
-    
+
     if (position === 'top') {
       y = margin;
     } else { // bottom
@@ -149,12 +149,12 @@ function createWindow() {
   // Create Tray Icon
   const iconDevPath = path.join(__dirname, 'icon.png');
   const iconPkgPath = path.join(process.resourcesPath, 'icon.png');
-  let trayIcon = fs.existsSync(iconDevPath) ? nativeImage.createFromPath(iconDevPath) : 
-                 (fs.existsSync(iconPkgPath) ? nativeImage.createFromPath(iconPkgPath) : nativeImage.createEmpty());
+  let trayIcon = fs.existsSync(iconDevPath) ? nativeImage.createFromPath(iconDevPath) :
+    (fs.existsSync(iconPkgPath) ? nativeImage.createFromPath(iconPkgPath) : nativeImage.createEmpty());
 
   tray = new Tray(trayIcon.isEmpty() ? nativeImage.createFromBuffer(Buffer.alloc(256)) : trayIcon.resize({ width: 16, height: 16 }));
   tray.setToolTip('Git XP Bar');
-  
+
   // Update menu whenever it might change
   const refreshMenu = () => tray.setContextMenu(buildTrayMenu());
   refreshMenu();
