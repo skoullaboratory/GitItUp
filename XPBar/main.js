@@ -86,8 +86,8 @@ function getLayout(shape, position) {
   let winWidth, winHeight, x, y;
 
   if (shape === 'circular') {
-    winWidth = 100;
-    winHeight = 100;
+    winWidth = 160;   // Increased from 140
+    winHeight = 160;  // Increased from 140
 
     if (position === 'top-left') {
       x = margin;
@@ -103,8 +103,8 @@ function getLayout(shape, position) {
       y = height - winHeight - margin;
     }
   } else { // horizontal
-    winWidth = 400;
-    winHeight = 40;
+    winWidth = 480;   // Increased from 460
+    winHeight = 100;  // Increased from 80
     x = Math.floor((width - winWidth) / 2);
 
     if (position === 'top') {
@@ -143,17 +143,17 @@ function expandWindow(expanded) {
   if (expanded) {
     if (currentData.shape === 'circular') {
       win.setBounds({
-        x: layout.x - 100,
-        y: layout.y - 250,
-        width: 300,
-        height: 350
+        x: layout.x - 150,
+        y: layout.y - 300,
+        width: 450,
+        height: 500
       });
     } else {
       win.setBounds({
-        x: layout.x,
-        y: layout.y - 120,
-        width: 400,
-        height: 160
+        x: layout.x - 60,
+        y: layout.y - 250,
+        width: 600,
+        height: 400
       });
     }
   } else {

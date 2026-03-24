@@ -16,17 +16,26 @@ body {
 
 body {
   background-color: transparent;
+  margin: 0;
+  padding: 0;
+  display: block;
+  overflow: hidden;
+  font-family: 'Outfit', sans-serif;
+  user-select: none;
+  opacity: var(--xp-idle-opacity);
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100vw;
+  height: 100vh;
+}
+
+.app-container {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  font-family: 'Outfit', sans-serif;
-  user-select: none;
-
-  /* Controlled by JS polling */
-  opacity: var(--xp-idle-opacity);
-  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
 }
 
 body.is-hovered,
@@ -199,34 +208,36 @@ body.mode-horizontal .xp-horizontal-wrapper { display: flex; }
 /* ── Theme Selector ── */
 .theme-selector-container {
   position: absolute;
-  bottom: 0px;
-  background: rgba(17, 19, 24, 0.85);
-  backdrop-filter: blur(12px);
-  border-radius: 12px;
-  padding: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateY(20px) scale(0.95);
+  background: rgba(17, 19, 24, 0.98);
+  backdrop-filter: blur(25px);
+  border-radius: 20px;
+  padding: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8);
   opacity: 0;
-  transform: translateY(10px) scale(0.95);
   pointer-events: none;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   z-index: 100;
-  width: auto;
-  min-width: 280px;
-}
-
-body.mode-circular .theme-selector-container {
-  bottom: 5px;
-}
-
-body.mode-horizontal .theme-selector-container {
-  bottom: 30px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
 }
 
 body.show-settings .theme-selector-container {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translate(-50%, -50%) scale(1);
   pointer-events: auto;
+}
+
+/* Hide everything else when settings are open */
+body.show-settings .xp-circle-wrapper,
+body.show-settings .xp-horizontal-wrapper {
+  opacity: 0.1;
+  filter: blur(4px);
+  pointer-events: none;
 }
 
 .theme-list {
@@ -275,13 +286,15 @@ body.show-settings .theme-selector-container {
 }
 
 body.mode-circular .settings-trigger {
-  top: 0;
-  right: 0;
+  top: 50%;
+  left: calc(50% + 40px);
+  transform: translateY(-50%);
 }
 
 body.mode-horizontal .settings-trigger {
-  top: -20px;
-  right: 0;
+  top: 50%;
+  left: calc(50% + 195px);
+  transform: translateY(-50%);
 }
 
 body.is-hovered .settings-trigger {
@@ -290,13 +303,13 @@ body.is-hovered .settings-trigger {
 
 .settings-trigger:hover {
   background: var(--xp-track);
-  transform: rotate(45deg);
+  transform: translateY(-50%) rotate(45deg);
 }
 
 body.show-settings .settings-trigger {
   background: var(--xp-to);
   color: #000;
-  transform: rotate(90deg);
+  transform: translateY(-50%) rotate(90deg);
 }
 
 .settings-title {
