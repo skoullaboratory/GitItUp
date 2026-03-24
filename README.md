@@ -1,7 +1,5 @@
 # 🎮 GitItUp — Gamify Your Git Workflow
 
-![GitItUp Hero](./Resources/hero.png)
-
 **GitItUp** is a sleek, always-on-top desktop overlay that turns every Git commit into an achievement. Level up as you code and transform your development workflow into an engaging progression system.
 
 ---
