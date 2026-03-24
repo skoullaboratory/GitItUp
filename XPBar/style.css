@@ -63,7 +63,8 @@ body.is-hovered .xp-circle-wrapper {
   stroke-width: 10;
   stroke-linecap: round;
   stroke-dasharray: 188.5;
-  stroke-dashoffset: 188.5; /* Starts empty, JS controls it */
+  stroke-dashoffset: 188.5;
+  /* Starts empty, JS controls it */
   transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -89,4 +90,97 @@ body.is-hovered .xp-circle-wrapper {
   -webkit-text-stroke: 4px var(--xp-track);
   paint-order: stroke fill;
   text-shadow: 0 0 12px rgba(118, 255, 3, 0.3);
+  transition: transform 0.2s ease, text-shadow 0.2s ease;
+}
+
+/* ── Effects ── */
+.xp-gain-anim {
+  animation: xp-pulse 0.4s ease-out;
+}
+
+.level-up-anim {
+  animation: level-flash 0.8s ease-out;
+}
+
+.badge-pop {
+  animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes xp-pulse {
+  0% {
+    stroke-width: 10;
+    filter: brightness(1);
+  }
+
+  50% {
+    stroke-width: 14;
+    filter: brightness(1.5);
+  }
+
+  100% {
+    stroke-width: 10;
+    filter: brightness(1);
+  }
+}
+
+@keyframes level-flash {
+  0% {
+    transform: scale(1);
+    filter: brightness(1) drop-shadow(0 0 0px var(--xp-to));
+  }
+
+  30% {
+    transform: scale(1.15);
+    filter: brightness(2) drop-shadow(0 0 20px var(--xp-to));
+  }
+
+  100% {
+    transform: scale(1);
+    filter: brightness(1) drop-shadow(0 0 0px var(--xp-to));
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.4);
+    filter: brightness(2);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Particles Container */
+#particles {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  background: var(--xp-to);
+  border-radius: 50%;
+  opacity: 0;
+  animation: explode 0.8s ease-out forwards;
+}
+
+@keyframes explode {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(0);
+    opacity: 0;
+  }
 }

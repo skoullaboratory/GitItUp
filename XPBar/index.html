@@ -31,6 +31,7 @@
     <!-- Level badge in the center -->
     <div class="xp-center">
       <div id="xp-level" class="xp-level-badge">1</div>
+      <div id="particles"></div>
     </div>
   </div>
 
@@ -48,6 +49,8 @@
     // ── DOM Elements ──
     const progressEl = document.getElementById('xp-progress');
     const levelEl = document.getElementById('xp-level');
+    const wrapper = document.querySelector('.xp-circle-wrapper');
+    const particlesContainer = document.getElementById('particles');
 
 
     // ── State ──
@@ -78,14 +81,61 @@
     function addXP(amount) {
       currentXP += amount;
       let maxXP = getMaxXP(level);
+      let levelsGained = 0;
 
       while (currentXP >= maxXP) {
         currentXP -= maxXP;
         level++;
+        levelsGained++;
         maxXP = getMaxXP(level);
       }
 
+      if (levelsGained > 0) {
+        triggerLevelUpEffects();
+      } else {
+        triggerGainXPEffects();
+      }
+
       updateRing();
+    }
+
+    function triggerGainXPEffects() {
+      progressEl.classList.remove('xp-gain-anim');
+      void progressEl.offsetWidth; // Trigger reflow
+      progressEl.classList.add('xp-gain-anim');
+    }
+
+    function triggerLevelUpEffects() {
+      // Flash the whole ring
+      wrapper.classList.remove('level-up-anim');
+      void wrapper.offsetWidth;
+      wrapper.classList.add('level-up-anim');
+
+      // Pop the badge
+      levelEl.classList.remove('badge-pop');
+      void levelEl.offsetWidth;
+      levelEl.classList.add('badge-pop');
+
+      // Explode particles
+      triggerParticles();
+    }
+
+    function triggerParticles() {
+      for (let i = 0; i < 12; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 40 + Math.random() * 40;
+        const size = 3 + Math.random() * 4;
+        
+        p.style.width = `${size}px`;
+        p.style.height = `${size}px`;
+        p.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
+        p.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
+        
+        particlesContainer.appendChild(p);
+        setTimeout(() => p.remove(), 1000);
+      }
     }
 
     // ── Git Commit Event ──
