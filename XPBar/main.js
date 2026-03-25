@@ -170,57 +170,8 @@ function expandWindow(expanded) {
 }
 
 function buildTrayMenu() {
-  const shape = currentData.shape || 'circular';
-  const pos = currentData.position || 'bottom-right';
-
   const template = [
-    { label: `GitItUp v${app.getVersion()}`, enabled: false },
-    { type: 'separator' },
-    {
-      label: 'Cambiar Estilo',
-      submenu: [
-        {
-          label: 'Forma',
-          submenu: [
-            { label: 'Circular', type: 'radio', checked: shape === 'circular', click: () => updateAppLayout('circular', 'bottom-right') },
-            { label: 'Horizontal', type: 'radio', checked: shape === 'horizontal', click: () => updateAppLayout('horizontal', 'bottom') }
-          ]
-        },
-        { type: 'separator' },
-        {
-          label: 'Posición',
-          submenu: shape === 'circular' ? [
-            { label: 'Arriba Izquierda', type: 'radio', checked: pos === 'top-left', click: () => updateAppLayout('circular', 'top-left') },
-            { label: 'Arriba Derecha', type: 'radio', checked: pos === 'top-right', click: () => updateAppLayout('circular', 'top-right') },
-            { label: 'Abajo Izquierda', type: 'radio', checked: pos === 'bottom-left', click: () => updateAppLayout('circular', 'bottom-left') },
-            { label: 'Abajo Derecha', type: 'radio', checked: pos === 'bottom-right', click: () => updateAppLayout('circular', 'bottom-right') }
-          ] : [
-            { label: 'Arriba', type: 'radio', checked: pos === 'top', click: () => updateAppLayout('horizontal', 'top') },
-            { label: 'Abajo', type: 'radio', checked: pos === 'bottom', click: () => updateAppLayout('horizontal', 'bottom') }
-          ]
-        }
-      ]
-    },
-    {
-      label: 'Temas de Color',
-      submenu: [
-        { label: 'Neon Cyan', type: 'radio', checked: currentData.theme === 'cyan-green', click: () => updateAppLayout(null, null, 'cyan-green') },
-        { label: 'Sunset Orange', type: 'radio', checked: currentData.theme === 'sunset', click: () => updateAppLayout(null, null, 'sunset') },
-        { label: 'Electric Purple', type: 'radio', checked: currentData.theme === 'purple-haze', click: () => updateAppLayout(null, null, 'purple-haze') },
-        { label: 'Royal Gold', type: 'radio', checked: currentData.theme === 'gold', click: () => updateAppLayout(null, null, 'gold') },
-        { label: 'Forest Green', type: 'radio', checked: currentData.theme === 'forest', click: () => updateAppLayout(null, null, 'forest') },
-        { label: 'Ocean Blue', type: 'radio', checked: currentData.theme === 'ocean', click: () => updateAppLayout(null, null, 'ocean') },
-        { label: 'Cherry Blossom', type: 'radio', checked: currentData.theme === 'cherry', click: () => updateAppLayout(null, null, 'cherry') },
-        { label: 'Volcano Red', type: 'radio', checked: currentData.theme === 'volcano', click: () => updateAppLayout(null, null, 'volcano') },
-        { label: 'Cyberpunk', type: 'radio', checked: currentData.theme === 'cyberpunk', click: () => updateAppLayout(null, null, 'cyberpunk') },
-        { label: 'Monochrome', type: 'radio', checked: currentData.theme === 'silver', click: () => updateAppLayout(null, null, 'silver') }
-      ]
-    },
-    { type: 'separator' },
-    { label: 'Mostrar aplicación', click: () => win.show() },
-    { label: 'Ocultar aplicación', click: () => win.hide() },
-    { type: 'separator' },
-    { label: 'Salir', click: () => app.quit() }
+    { label: 'Salir de GitItUp', click: () => app.quit() }
   ];
 
   return Menu.buildFromTemplate(template);
