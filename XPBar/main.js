@@ -41,6 +41,7 @@ function saveData(data) {
 // ── Git Automation ──
 function installGlobalHook() {
   const hooksDir = path.join(app.getPath('userData'), 'hooks');
+
   try {
     if (!fs.existsSync(hooksDir)) {
       fs.mkdirSync(hooksDir, { recursive: true });
