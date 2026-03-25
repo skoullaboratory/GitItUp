@@ -1,6 +1,6 @@
 {
   "name": "git-it-up",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "A progress-tracking desktop overlay for developers.",
   "main": "main.js",
   "scripts": {

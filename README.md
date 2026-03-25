@@ -1,36 +1,26 @@
-# GitItUp — Level Up Your Code (v0.3.3) 🚀
+# GitItUp — Level Up Your Code (v0.4) 🚀
 
-GitItUp is a sleek, always-on-top desktop overlay that gamifies your coding workflow. Every Git commit earns you XP, increases your daily streak, and triggers high-juice visual rewards. 
+GitItUp is a sleek, always-on-top desktop overlay that gamifies your coding workflow. Every action in Git earns you XP, increases your daily streak, and triggers high-juice visual rewards. 
+
 ## ✨ Key Features
 
 *   **Zero-Config Automation**: GitItUp automatically configures your global Git hooks on first launch. Tracking XP across all your projects has never been easier.
 *   **XP Orb Absorption**: Experience the "juice" with new XP orb absorption animations that fly directly to your progress bar on every commit.
-*   **Epic Level Ups**: Multi-effect feedback including screen shake, radial flashes, and floating "LEVEL UP!" text.
-*   **Smart Scoring**: Every action counts differently:
+*   **Smart Scoring System** (v0.4):
     *   **Commit**: 1 XP 📝
     *   **Push**: 25 XP 🚀
     *   **Merge/PR**: 50 XP 🤝
-*   **Daily Activity Streak**: A persistent streak system with an animated flame indicator.
-*   **Unified UI State**: Access all customization (themes, layouts, opacity) from a single in-app menu with intuitive navigation.
-*   **Dual Layouts**: Switch between a minimalist **Circular Ring** or a classic **Horizontal XP Bar**.
-*   **Visual Themes**: Choose from 10 premium gradients that apply to the bar, particles, and the new streak flame.
-
----
-
-## 🛠️ Technical Highlights
-
-*   **Electron-Powered**: Lightweight, hardware-accelerated desktop overlay.
-*   **Local HTTP API**: Listens on port `31415` for Git activity, making integration with any tool simple.
-*   **Persistence**: Automatically saves your level, XP, total commits, and daily streak to your local system.
-*   **Taskbar Aware**: Intelligently detects your taskbar position to prevent UI overlaps and ensure full visibility.
+*   **Epic Level Ups**: Multi-effect feedback including screen shake, radial flashes, and floating "LEVEL UP!" text.
 
 ---
 
 ## 🚀 Getting Started
 
-1.  **Download** the latest release (`GitItUp 0.3.3.exe`).
-2.  **Run**: Open `XPBar/dist/GitItUp 0.3.3.exe`.
-3.  **Level Up**: Start making commits in any of your Git projects to see your XP grow and your streak ignite instantly!
+1.  **Download** the latest release (`GitItUp 0.4.0.exe`).
+2.  **Run**: Launch the application.
+3.  **Level Up**: Start making commits, pushing, and merging to see your bar grow!
+
+*Tip: If the automated setup doesn't trigger, run `Instalar_Hooks.bat` to fix it.*
 
 ---
 

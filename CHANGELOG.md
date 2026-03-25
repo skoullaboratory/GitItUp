@@ -1,14 +1,17 @@
 # GitItUp — Changelog
 
-## [0.3.3] — 2026-03-25
+## [0.4.0] — 2026-03-25
 
 ### Features & Improvements
-- **Zero Configuration Integration**: Automatic installation of global Git hooks on first launch. GitItUp now track XP across all your repositories without manual setup.
-- **Improved Windows Support**: Better path normalization for Git hooks on Windows to ensure reliable XP tracking for all users.
-- **XP Orb Animation**: New visual feedback where experience orbs fly directly to the bar on every commit.
-- **Enhanced Level Up**: Screen shake, radial light flash, and floating "LEVEL UP!" notification.
-- **Streak System**: Persistent daily activity tracking with an animated flame indicator.
-- **In-App Settings**: Unified configuration overlay for themes, layouts, and transparency.
+- **Smart Scoring System**: Differentiated XP for different Git actions (Commits, Pushes, Merges).
+- **Expanded Automation**: The app now installs multiple global Git hooks (`post-commit`, `pre-push`, `post-merge`).
+- **Setup Script**: Added `Instalar_Hooks.bat` for easy manual setup or repairs.
+- **Visual Feedback**: Screen-flash effect when receiving Git events to confirm detection.
+- **Performance Optimization**: Hooks now run in the background to ensure no delay in your Git workflow.
+
+---
+
+## Version 0.3.3
 
 ---
 
