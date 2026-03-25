@@ -1,4 +1,4 @@
-# 🎮 GitItUp — Gamify Your Git Workflow
+# 🎮 GitItUp
 
 **GitItUp** is a sleek, always-on-top desktop overlay that turns every Git commit into an achievement. Level up as you code and transform your development workflow into an engaging progression system.
 
@@ -7,6 +7,8 @@
 ## ✨ Features (v0.0.1)
 
 - **🔄 Dual Layouts** — Choose between a minimalist **Circular Ring** or a classic **Horizontal XP Bar**.
+- **🎨 Visual Theme Picker** — Select from 10 premium color gradients using a rectangular visual selector.
+- **🎚️ Transparency Control** — Adjust the default idle opacity with a slider directly in the settings.
 - **📍 Dynamic Positioning** — Place it anywhere: top-left, top-right, bottom-left, or bottom-right.
 - **🔗 Universal Git Integration** — Earn 25 XP automatically on every `git commit` (tracked globally).
 - **🕹️ Persistent Progress** — Your level, total commits, and current XP are saved between sessions.
@@ -24,25 +26,6 @@ The core Electron-based application that powers the overlay.
 *   **Electron + Node.js** — Fast, lightweight, and extensible.
 *   **Web-Tech Driven** — Styled with CSS animations and HTML5 Canvas.
 *   **Local HTTP Server** — Listens on port `31415` for Git hook notifications.
-
----
-
-## 🚀 Quick Start
-
-To get up and running with **GitItUp**:
-
-1.  **Download & Install**: 
-    Clone this repository or download the latest release.
-2.  **Activate Progress Tracking**: 
-    Run `install-hook.bat` (Windows) in the `XPBar` folder. This sets up a global Git hook so **every repository** on your machine earns you XP.
-3.  **Start the Overlay**: 
-    Navigate to `XPBar` and run:
-    ```bash
-    npm install
-    npm start
-    ```
-4.  **Level Up**: 
-    Start committing! Each commit grants you **25 XP**. The path to your next level scales by **1.5x** each time you level up.
 
 ---
 
