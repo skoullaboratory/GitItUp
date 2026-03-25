@@ -40,6 +40,13 @@
 
   <!-- 3. Theme Selector Overlay -->
   <div class="theme-selector-container" id="theme-selector">
+    <div class="settings-header">
+      <button class="back-btn" id="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Volver
+      </button>
+    </div>
+
     <div class="settings-title">Estilo</div>
     <div class="segment-control" id="shape-selector">
       <button class="segment-btn" data-value="circular">Circular</button>
@@ -100,6 +107,7 @@
     const shapeSelector = document.getElementById('shape-selector');
     const positionSelector = document.getElementById('position-selector');
     const exitAppBtn = document.getElementById('exit-app-btn');
+    const backBtn = document.getElementById('back-btn');
 
     // ── State ──
     let level = 1;
@@ -195,6 +203,12 @@
       const showing = document.body.classList.toggle('show-settings');
       if (showing) refreshSettingsUI();
       ipcRenderer.send('expand-window', showing);
+    };
+
+    backBtn.onclick = (e) => {
+      e.stopPropagation();
+      document.body.classList.remove('show-settings');
+      ipcRenderer.send('expand-window', false);
     };
 
     exitAppBtn.onclick = () => {

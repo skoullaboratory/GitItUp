@@ -269,7 +269,9 @@ body.mode-horizontal .xp-horizontal-wrapper {
   pointer-events: none;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   z-index: 100;
-  width: 320px;
+  width: 360px;
+  max-height: 90vh;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
@@ -456,9 +458,43 @@ body.is-hovered .settings-trigger {
 }
 
 body.show-settings .settings-trigger {
-  background: var(--xp-to);
-  color: #000;
-  transform: translateY(-50%) rotate(90deg);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%) rotate(180deg) scale(0);
+}
+
+.settings-header {
+  display: flex;
+  margin-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 12px;
+}
+
+.back-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.back-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .settings-title {

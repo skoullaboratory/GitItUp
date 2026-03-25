@@ -136,10 +136,11 @@ function expandWindow(expanded) {
   const layout = getLayout(currentData.shape, currentData.position);
   if (expanded) {
     const primaryDisplay = screen.getPrimaryDisplay();
-    const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
+    const { x: areaX, y: areaY, width: areaW, height: areaH } = primaryDisplay.workArea;
     
-    let expWidth = currentData.shape === 'circular' ? 450 : 600;
-    let expHeight = currentData.shape === 'circular' ? 500 : 400;
+    // Increased canvas size significantly to avoid scrollbars or cutoffs
+    let expWidth = currentData.shape === 'circular' ? 550 : 700;
+    let expHeight = currentData.shape === 'circular' ? 700 : 600;
 
     // Center the expanded window on the bar's current location
     let centerX = layout.x + layout.width / 2;
@@ -148,12 +149,14 @@ function expandWindow(expanded) {
     let targetX = Math.floor(centerX - expWidth / 2);
     let targetY = Math.floor(centerY - expHeight / 2);
 
-    // Padding from screen edges
+    // Padding from screen/workarea edges (20px)
     const p = 20;
-    if (targetX < p) targetX = p;
-    if (targetY < p) targetY = p;
-    if (targetX + expWidth > screenWidth - p) targetX = screenWidth - expWidth - p;
-    if (targetY + expHeight > screenHeight - p) targetY = screenHeight - expHeight - p;
+    
+    // Clamp to workArea (skipping taskbar)
+    if (targetX < areaX + p) targetX = areaX + p;
+    if (targetY < areaY + p) targetY = areaY + p;
+    if (targetX + expWidth > areaX + areaW - p) targetX = areaX + areaW - expWidth - p;
+    if (targetY + expHeight > areaY + areaH - p) targetY = areaY + areaH - expHeight - p;
 
     win.setBounds({
       x: targetX,
