@@ -41,7 +41,6 @@ function saveData(data) {
 // ── Git Automation ──
 function installGlobalHook() {
   const hooksDir = path.join(app.getPath('userData'), 'hooks');
-  
   try {
     if (!fs.existsSync(hooksDir)) {
       fs.mkdirSync(hooksDir, { recursive: true });
@@ -133,7 +132,7 @@ function getLayout(shape, position) {
 function updateAppLayout(shape, position, theme) {
   if (shape) currentData.shape = shape;
   if (theme) currentData.theme = theme;
-  
+
   // Validate position based on shape if shape changed or position provided
   if (shape) {
     if (shape === 'circular') {
@@ -146,22 +145,22 @@ function updateAppLayout(shape, position, theme) {
       }
     }
   }
-  
+
   if (position) currentData.position = position;
 
-  saveData({ 
-    shape: currentData.shape, 
-    position: currentData.position, 
-    theme: currentData.theme 
+  saveData({
+    shape: currentData.shape,
+    position: currentData.position,
+    theme: currentData.theme
   });
 
   const layout = getLayout(currentData.shape, currentData.position);
   if (win) {
     win.setBounds(layout);
-    win.webContents.send('update-style', { 
-      shape: currentData.shape, 
-      position: currentData.position, 
-      theme: currentData.theme 
+    win.webContents.send('update-style', {
+      shape: currentData.shape,
+      position: currentData.position,
+      theme: currentData.theme
     });
     // Ensure window is always on top after move
     win.setAlwaysOnTop(true, 'screen-saver', 1);
@@ -177,7 +176,7 @@ function expandWindow(expanded) {
   if (expanded) {
     const primaryDisplay = screen.getPrimaryDisplay();
     const { x: areaX, y: areaY, width: areaW, height: areaH } = primaryDisplay.workArea;
-    
+
     // Increased canvas size significantly to avoid scrollbars or cutoffs
     let expWidth = currentData.shape === 'circular' ? 550 : 700;
     let expHeight = currentData.shape === 'circular' ? 700 : 600;
@@ -191,7 +190,7 @@ function expandWindow(expanded) {
 
     // Padding from screen/workarea edges (20px)
     const p = 20;
-    
+
     // Clamp to workArea (skipping taskbar)
     if (targetX < areaX + p) targetX = areaX + p;
     if (targetY < areaY + p) targetY = areaY + p;
@@ -285,10 +284,10 @@ function createWindow() {
 
   win.webContents.on('did-finish-load', () => {
     win.webContents.send('init-data', currentData);
-    win.webContents.send('update-style', { 
-      shape: currentData.shape, 
-      position: currentData.position, 
-      theme: currentData.theme 
+    win.webContents.send('update-style', {
+      shape: currentData.shape,
+      position: currentData.position,
+      theme: currentData.theme
     });
   });
 
@@ -323,7 +322,7 @@ ipcMain.on('save-data', (event, data) => saveData(data));
 const PORT = 31415;
 const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  
+
   // Extraer endpoint (commit, push, pr)
   const endpoint = req.url.split('?')[0].slice(1);
   const validEvents = ['commit', 'push', 'pr'];
