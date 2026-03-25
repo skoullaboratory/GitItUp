@@ -1,41 +1,63 @@
-# <img src="./XPBar/GitItUpLogo.png" height="40" align="center"> GitItUp — Level Up Your Code (v0.4.5) 🚀
+<p align="center">
+  <img src="XPBar/GitItUpLogo.png" width="220">
+</p>
 
-**GitItUp** is a sleek, hardware-accelerated desktop overlay designed to gamify your development flow. Every action in Git earns you XP, levels up your profile, and ignites your daily streak. High-juice visual rewards for your productivity.
+<h1 align="center">GITITUP</h1>
 
-![GitItUp Hero](./Resources/hero.png)
-
----
-
-## ✨ Key Features (v0.4.5)
-
-*   **Zero-Config Automation**: GitItUp automatically configures your global Git hooks upon first launch. Track XP across all your projects effortlessly.
-*   **Smart Scoring System**: Not all actions are equal! Grow your bar with:
-    *   **Commit**: 1 XP 📝
-    *   **Push**: 25 XP 🚀
-    *   **Merge / PR**: 50 XP 🤝
-*   **Custom Modding (CSS)**: Use your own style! Import any `.css` file from the settings menu to completely theme the bar.
-*   **Ignite Your Streak**: A persistent daily streak system with an animated flame indicator that fuels your motivation.
-*   **Juicy Visual Feedback**: Experience orbs flying to your bar, screen shakes, and radial flashes when you action code.
+<p align="center">
+  <b>A Minimalist Git Gamification Overlay for Windows</b><br>
+  <i>Merging code productivity with immersive RPG-style progress tracking.</i>
+</p>
 
 ---
 
-## 🚀 Getting Started
+### [ PROJECT OVERVIEW ]
 
-1.  **Download**: Get the latest **`GitItUp 0.4.5.exe`** from the [Releases](https://github.com/skoullaboratory/GitItUp/releases) page.
-2.  **Launch**: Open the executable. The app will stay on top of your windows.
-3.  **Code**: Start making commits, pushing, and merging. Your bar will update instantly!
+**GitItUp** is a sleek, hardware-accelerated desktop overlay designed to gamify your development workflow. It acts as an interactive widget that reacts in real-time to your Git activity, providing high-juice visual rewards and persistent progress tracking for every line of code you commit.
 
-> [!NOTE] 
-> If for some reason the automated setup doesn't trigger, run the **`Instalar_Hooks.bat`** file once to fix the global Git configuration.
+### [ CORE SPECIFICATIONS ]
+
+| Feature | Description |
+| :--- | :--- |
+| **Git Sync** | Automatic tracking via global hooks (Commit, Push, Merge). |
+| **Visual Effects** | Dynamic XP orb absorption and radial "Level Up" flashes. |
+| **Modding** | External CSS import support for advanced UI customization. |
+| **Persistence** | Local data encryption for levels, XP, and daily streaks. |
 
 ---
 
-## 🛠️ Personalización & Modding
+### [ SYSTEM CAPABILITIES ]
 
-Accede al icono de **Ajustes** (visible al pasar el ratón) para personalizar:
-*   **Shape**: Alterna entre el **Círculo Minimalista** o la **Barra Horizontal**.
-*   **Temas**: Elige entre 10 gradientes premium o importa tu propio mod de CSS.
-*   **Transparencia**: Ajusta la visibilidad ideal para que no te distraiga de tu código.
+* **SMART SCORING SYSTEM**
+  Not all actions are equal. The progression engine calculates rewards based on the impact of your Git operations:
+  - **Commit:** 1 XP (Foundation) 📝
+  - **Push:** 25 XP (Momentum) 🚀
+  - **Merge / PR:** 50 XP (Milestone) 🤝
+
+* **IGNITE YOUR STREAK**
+  Persistence is rewarded. A daily activity engine tracks your consistency, igniting an animated flame badge that fuels your motivation across multiple project sessions.
+  
+* **FLUID AUTOMATION**
+  The infrastructure is designed for "Zero Config". Upon launch, the core automatically configures your global Git environment to sync with the background worker process without manual terminal intervention.
+
+---
+
+### [ OPERATIONAL GUIDE ]
+
+1. **INITIALIZE:** Execute `GitItUp 0.4.5.exe` to launch the overlay.
+2. **SYNC:** Start committing code in any of your Git repositories.
+3. **MANIPULATE:** Hover over the UI to reveal the **Settings Gear** for layout control.
+4. **ADJUST:** Toggle between **Circular** or **Horizontal** layouts and fine-tune opacity.
+
+---
+
+### [ SECURITY & EXECUTION ]
+Note on Windows SmartScreen: As this is an independently developed project, the executable is not currently signed with a commercial Microsoft certificate. This may trigger a "Windows Protected Your PC" warning during the initial launch.
+
+To execute the application:
+1. Click on **"More Info"**.
+2. Select **"Run Anyway"**.
+This warning is standard for software from unverified publishers and does not indicate a security risk.
 
 ---
 
