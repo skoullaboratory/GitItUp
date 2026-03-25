@@ -443,12 +443,15 @@
 
     ipcRenderer.on('git-event', (event, type) => {
       console.log(`[Frontend] Evento de Git detectado: ${type}`);
+      // Flash visual para confirmar recepción
+      document.body.classList.add('flash-anim');
+      setTimeout(() => document.body.classList.remove('flash-anim'), 500);
       
       let xpToAdd = 0;
       if (type === 'commit') {
         totalCommits++;
         updateStreak();
-        xpToAdd = 1;
+        xpToAdd = 5; // Aumentado a 5 para visibilidad en tests
       } else if (type === 'push') {
         xpToAdd = 25;
       } else if (type === 'pr') {

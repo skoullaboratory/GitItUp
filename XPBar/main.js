@@ -55,9 +55,10 @@ function installGlobalHook() {
     ];
 
     hooks.forEach(h => {
-      // Usamos & para que curl corra en segundo plano y no bloquee a Git
+      const hookPath = path.join(hooksDir, h.name);
       const content = `#!/bin/sh\n# GitItUp Auto-Hook\ncurl -s -X POST http://127.0.0.1:31415/${h.type} > /dev/null 2>&1 &\nexit 0\n`;
-      fs.writeFileSync(path.join(hooksDir, h.name), content, { mode: 0o755 });
+      fs.writeFileSync(hookPath, content, { mode: 0o755 });
+      console.log(`[Hooks] Archivo escrito: ${h.name} -> ${hookPath}`);
     });
 
     exec('git --version', (err) => {
