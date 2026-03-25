@@ -1,60 +1,47 @@
-# 🎮 GitItUp
+# GitItUp — Level Up Your Code (v0.3)
 
-**GitItUp** is a sleek, always-on-top desktop overlay that gamifies your coding workflow. Every Git commit earns you XP and levels you up, transforming your daily tasks into an engaging progression system.
-
----
-
-## 🚀 Recent Changes (v0.0.1 Release)
-
-Compared to previous internal builds, this release introduces several major enhancements:
-
-*   **🛠️ Unified Settings Interface**: Tray icon settings have been consolidated into a beautiful in-app overlay. Access themes, positions, and shapes directly from the gear icon on hover.
-*   **🎨 Premium Theme Engine**: A new visual picker with 10 hand-crafted gradients (Neon Cyan, Sunset, Cyberpunk, etc.).
-*   **🚪 Instant Exit**: Added a dedicated "Salir Aplicación" button within the settings menu for clean termination.
-*   **📦 Portable Build**: The project is now compiled into a standalone Windows executable (`.exe`) located in `XPBar/dist/`.
-*   **🔧 Professional Experience**: Improved window logic for "Always on Top" and click-through/hover transitions.
+GitItUp is a sleek, always-on-top desktop overlay that gamifies your coding workflow. Every Git commit earns you XP, increases your daily streak, and triggers high-juice visual rewards.
 
 ---
 
-## ✨ Core Features
+## What's New in v0.3
 
-- **🔄 Dual Layouts** — Switch between a minimalist **Circular Ring** or a classic **Horizontal XP Bar**.
-- **📍 Multi-Positioning** — Snap to any screen corner: top-left, top-right, bottom-left, or bottom-right.
-- **👁️ Smart Visibility** — Stays translucent (low opacity) and click-through while you work; becomes fully opaque and interactive on mouse hover.
-- **🎚️ Transparency Control** — Adjust your preferred idle opacity using a slider in the settings.
-- **🕹️ Persistent Leveling** — Your level, XP, and layout settings are automatically saved and restored.
-
----
-
-## 📂 Project Structure
-
-This repository is organized as follows:
-
-### 🏆 [XP Bar](./XPBar)
-The core Electron-based application.
-*   **Electron Main**: Manages the window, tray, and persistence.
-*   **Local HTTP API**: Listens on port `31415` for commit signals from Git hooks.
-*   **Frontend**: Built with HTML5, CSS animations, and Outfit typography.
+*   **Integrated Reward System**: Experience the "juice" with new XP orb absorption animations that fly directly to your progress bar.
+*   **Epic Level Ups**: Multi-effect feedback including screen shake, radial flashes, and floating "LEVEL UP!" text.
+*   **Daily Streak Tracking**: A new animated flame indicator tracks how many consecutive days you've been committing code.
+*   **Unified Settings Overlay**: Access all customization (themes, layouts, opacity) from a single in-app menu with intuitive "Back" navigation.
+*   **Intelligent UI**: The overlay now detects your taskbar position to prevent overlaps and ensures the settings panel is always fully visible.
+*   **Minimalist Tray**: A cleaner system tray experience focused on essentials.
 
 ---
 
-## 🛠️ Getting Started
+## Core Features
 
-1.  **Download/Clone** the repository.
-2.  **Run the Executable**: Navigate to `XPBar/dist/` and run `GitItUp 0.0.1.exe`.
-3.  **Start Coding**: Every `git commit` you make will now grant you XP and level you up!
-
----
-
-## ⚙️ How It Works
-
-1.  The app runs a lightweight HTTP server on `localhost:31415`.
-2.  Your Git hook sends a `POST` request to the app after every successful commit.
-3.  The overlay receives the signal, triggers a level-up animation, and persists your progress in a local JSON file.
-4.  **Manual Query**: You can see your raw stats via `GET http://localhost:31415/status`.
+- **Dual Layouts**: Switch between a minimalist Circular Ring or a classic Horizontal XP Bar.
+- **Visual Themes**: Choose from 10 premium gradients that apply to the bar, particles, and the new streak flame.
+- **Smart Visibility**: Non-intrusive 15% opacity while working; 100% opacity and interactivity on hover.
+- **Persistent Progress**: Your level, XP, total commits, and daily streak are automatically saved.
 
 ---
 
-## ⚖️ License
+## Project Structure
+
+### [GitItUp](./XPBar)
+The core Electron application.
+*   **Electron Main**: Process management and local persistence.
+*   **Local HTTP API**: Listens on port 31415 for Git activity.
+*   **Frontend**: Built with vanilla hardware-accelerated web tech.
+
+---
+
+## Getting Started
+
+1.  **Download** the repository or the latest release.
+2.  **Run**: Open `XPBar/dist/GitItUp 0.3.0.exe`.
+3.  **Level Up**: Start making commits to see your XP grow and your streak ignite.
+
+---
+
+## License
 
 Distributed under the ISC License. See `LICENSE` for more information.
