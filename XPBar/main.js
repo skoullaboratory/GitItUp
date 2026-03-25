@@ -1,4 +1,4 @@
-const { app, BrowserWindow, screen, ipcMain, Tray, Menu, nativeImage } = require('electron');
+const { app, BrowserWindow, screen, ipcMain, Tray, Menu, nativeImage, dialog } = require('electron');
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -222,8 +222,8 @@ function createWindow() {
   const layout = getLayout(currentData.shape, currentData.position);
 
   // Create Tray Icon
-  const iconDevPath = path.join(__dirname, 'icon.png');
-  const iconPkgPath = path.join(process.resourcesPath, 'icon.png');
+  const iconDevPath = path.join(__dirname, 'GitItUpLogo.png');
+  const iconPkgPath = path.join(process.resourcesPath, 'GitItUpLogo.png');
   let trayIcon = fs.existsSync(iconDevPath) ? nativeImage.createFromPath(iconDevPath) :
     (fs.existsSync(iconPkgPath) ? nativeImage.createFromPath(iconPkgPath) : nativeImage.createEmpty());
 
@@ -260,6 +260,31 @@ function createWindow() {
     saveData({ opacity });
   });
 
+  ipcMain.on('import-css', (event) => {
+    dialog.showOpenDialog(win, {
+      properties: ['openFile'],
+      filters: [{ name: 'Stylesheets', extensions: ['css'] }]
+    }).then(result => {
+      if (!result.canceled && result.filePaths.length > 0) {
+        const cssPath = result.filePaths[0];
+        try {
+          const content = fs.readFileSync(cssPath, 'utf-8');
+          currentData.customCSSPath = cssPath;
+          saveData({ customCSSPath: cssPath });
+          event.reply('apply-custom-css', content);
+        } catch (e) {
+          console.error('Failed to read CSS:', e);
+        }
+      }
+    });
+  });
+
+  ipcMain.on('clear-css', (event) => {
+    currentData.customCSSPath = null;
+    saveData({ customCSSPath: null });
+    event.reply('apply-custom-css', '');
+  });
+
   win = new BrowserWindow({
     width: layout.width,
     height: layout.height,
@@ -284,6 +309,14 @@ function createWindow() {
   win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
 
   win.webContents.on('did-finish-load', () => {
+    // Load custom CSS if exists
+    if (currentData.customCSSPath && fs.existsSync(currentData.customCSSPath)) {
+      try {
+        const content = fs.readFileSync(currentData.customCSSPath, 'utf-8');
+        win.webContents.send('apply-custom-css', content);
+      } catch(e) {}
+    }
+
     win.webContents.send('init-data', currentData);
     win.webContents.send('update-style', {
       shape: currentData.shape,

@@ -53,10 +53,13 @@
   <!-- 3. Theme Selector Overlay -->
   <div class="theme-selector-container" id="theme-selector">
     <div class="settings-header">
-      <button class="back-btn" id="back-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-        Volver
-      </button>
+      <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+        <button class="back-btn" id="back-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Volver
+        </button>
+        <img src="GitItUpLogo.png" alt="Logo" style="height: 24px; opacity: 0.9;">
+      </div>
     </div>
 
     <div class="settings-title">Estilo</div>
@@ -76,6 +79,14 @@
     <div class="settings-title">Transparencia</div>
     <div class="transparency-control">
       <input type="range" id="opacity-slider" min="0.05" max="1.0" step="0.01" value="1.0">
+    </div>
+
+    <div class="settings-title">Modding (CSS)</div>
+    <div class="setting-item" style="padding: 0 15px; margin-top: 5px;">
+      <div style="display: flex; gap: 8px;">
+        <button id="import-css-btn" class="settings-btn" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.85em;">Importar .css</button>
+        <button id="clear-css-btn" class="settings-btn" style="flex: 0.5; padding: 10px; border-radius: 8px; font-size: 0.85em; background: rgba(255,255,255,0.1);">Reset</button>
+      </div>
     </div>
 
     <div class="settings-footer">
@@ -146,6 +157,25 @@
       'cyberpunk': ['#ff00cc', '#3333ff'],
       'silver': ['#bdc3c7', '#2c3e50']
     };
+
+    // ── Custom Style System ──
+    ipcRenderer.on('apply-custom-css', (event, content) => {
+      let styleTag = document.getElementById('custom-mod-style');
+      if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = 'custom-mod-style';
+        document.head.appendChild(styleTag);
+      }
+      styleTag.textContent = content;
+    });
+
+    // We use defer or wait for DOM, but these are already in script
+    document.getElementById('import-css-btn').addEventListener('click', () => {
+      ipcRenderer.send('import-css');
+    });
+    document.getElementById('clear-css-btn').addEventListener('click', () => {
+      ipcRenderer.send('clear-css');
+    });
 
     function getMaxXP(lvl) {
       return Math.floor(BASE_XP * Math.pow(GROWTH_FACTOR, lvl - 1));

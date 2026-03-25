@@ -1,6 +1,6 @@
 {
   "name": "git-it-up",
-  "version": "0.4.0",
+  "version": "0.4.5",
   "description": "A progress-tracking desktop overlay for developers.",
   "main": "main.js",
   "scripts": {
@@ -17,7 +17,7 @@
       "target": [
         "portable"
       ],
-      "icon": "icon.png"
+      "icon": "GitItUpLogo.ico"
     }
   },
   "keywords": [],

@@ -1,38 +1,41 @@
-# GitItUp — Level Up Your Code (v0.4) 🚀
+# <img src="./XPBar/GitItUpLogo.png" height="40" align="center"> GitItUp — Level Up Your Code (v0.4.5) 🚀
 
-GitItUp is a sleek, always-on-top desktop overlay that gamifies your coding workflow. Every action in Git earns you XP, increases your daily streak, and triggers high-juice visual rewards. 
+**GitItUp** is a sleek, hardware-accelerated desktop overlay designed to gamify your development flow. Every action in Git earns you XP, levels up your profile, and ignites your daily streak. High-juice visual rewards for your productivity.
 
-## ✨ Key Features
+![GitItUp Hero](./Resources/hero.png)
 
-*   **Zero-Config Automation**: GitItUp automatically configures your global Git hooks on first launch. Tracking XP across all your projects has never been easier.
-*   **XP Orb Absorption**: Experience the "juice" with new XP orb absorption animations that fly directly to your progress bar on every commit.
-*   **Smart Scoring System** (v0.4):
+---
+
+## ✨ Key Features (v0.4.5)
+
+*   **Zero-Config Automation**: GitItUp automatically configures your global Git hooks upon first launch. Track XP across all your projects effortlessly.
+*   **Smart Scoring System**: Not all actions are equal! Grow your bar with:
     *   **Commit**: 1 XP 📝
     *   **Push**: 25 XP 🚀
-    *   **Merge/PR**: 50 XP 🤝
-*   **Epic Level Ups**: Multi-effect feedback including screen shake, radial flashes, and floating "LEVEL UP!" text.
+    *   **Merge / PR**: 50 XP 🤝
+*   **Custom Modding (CSS)**: Use your own style! Import any `.css` file from the settings menu to completely theme the bar.
+*   **Ignite Your Streak**: A persistent daily streak system with an animated flame indicator that fuels your motivation.
+*   **Juicy Visual Feedback**: Experience orbs flying to your bar, screen shakes, and radial flashes when you action code.
 
 ---
 
 ## 🚀 Getting Started
 
-1.  **Download** the latest release (`GitItUp 0.4.0.exe`).
-2.  **Run**: Launch the application.
-3.  **Level Up**: Start making commits, pushing, and merging to see your bar grow!
+1.  **Download**: Get the latest **`GitItUp 0.4.5.exe`** from the [Releases](https://github.com/skoullaboratory/GitItUp/releases) page.
+2.  **Launch**: Open the executable. The app will stay on top of your windows.
+3.  **Code**: Start making commits, pushing, and merging. Your bar will update instantly!
 
-*Tip: If the automated setup doesn't trigger, run `Instalar_Hooks.bat` to fix it.*
-
----
-
-## 🎨 Customization
-
-Access the **Settings Gear** (visible on hover) to customize:
-*   **Shape**: Circular Ring vs Horizontal Bar.
-*   **Position**: Support for all screen corners and edges.
-*   **Themes**: 10 hand-picked gradients including *Sunset*, *Cyberpunk*, and *Forest*.
-*   **Transparency**: Fine-tune idle visibility to stay focused.
+> [!NOTE] 
+> If for some reason the automated setup doesn't trigger, run the **`Instalar_Hooks.bat`** file once to fix the global Git configuration.
 
 ---
+
+## 🛠️ Personalización & Modding
+
+Accede al icono de **Ajustes** (visible al pasar el ratón) para personalizar:
+*   **Shape**: Alterna entre el **Círculo Minimalista** o la **Barra Horizontal**.
+*   **Temas**: Elige entre 10 gradientes premium o importa tu propio mod de CSS.
+*   **Transparencia**: Ajusta la visibilidad ideal para que no te distraiga de tu código.
 
 ---
 
