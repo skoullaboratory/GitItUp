@@ -55,7 +55,7 @@ function installGlobalHook() {
     ];
 
     hooks.forEach(h => {
-      const content = `#!/bin/sh\n# GitItUp Auto-Hook\ncurl -s -X POST http://127.0.0.1:31415/${h.type} > /dev/null 2>&1 || true\n`;
+      const content = `#!/bin/sh\n# GitItUp Auto-Hook\ncurl -s -X POST http://127.0.0.1:31415/${h.type} > /dev/null 2>&1 || true\nexit 0\n`;
       fs.writeFileSync(path.join(hooksDir, h.name), content, { mode: 0o755 });
     });
 
@@ -321,10 +321,13 @@ const PORT = 31415;
 const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   
-  const endpoint = req.url.slice(1); // 'commit', 'push', or 'pr'
+  // Parse endpoint (handle both /commit and /commit?...)
+  const url = new URL(req.url, `http://${req.headers.host}`);
+  const endpoint = url.pathname.slice(1); 
   const validEvents = ['commit', 'push', 'pr'];
 
   if (req.method === 'POST' && validEvents.includes(endpoint)) {
+    console.log(`[Git Event] Recibido: ${endpoint}`);
     if (win && !win.isDestroyed()) win.webContents.send('git-event', endpoint);
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ ok: true }));
