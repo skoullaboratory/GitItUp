@@ -1,8 +1,6 @@
-# 🎮 GitItUp — Level Up Your Code (v0.0.1)
+# 🎮 GitItUp
 
 **GitItUp** is a sleek, always-on-top desktop overlay that gamifies your coding workflow. Every Git commit earns you XP and levels you up, transforming your daily tasks into an engaging progression system.
-
-![GitItUp Hero](./Resources/hero.png)
 
 ---
 
