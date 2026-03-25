@@ -15,6 +15,12 @@
   <div class="app-container">
   <!-- 1. Circular Mode -->
   <div class="xp-circle-wrapper">
+    <div class="streak-badge" title="Racha de días seguidos">
+      <svg class="flame-icon" viewBox="0 0 24 24">
+        <path d="M12,2C12,2 12,7 9,10C7,12 8,15 10,17C12,19 14,19 16,17C18,15 17,11 15,9C14,8 13,8 12,8C12,8 12,2 12,2Z" />
+      </svg>
+      <span class="streak-count">x1</span>
+    </div>
     <svg class="xp-ring-svg" viewBox="0 0 80 80">
       <defs>
         <linearGradient id="xp-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -32,6 +38,12 @@
 
   <!-- 2. Horizontal Mode -->
   <div class="xp-horizontal-wrapper">
+    <div class="streak-badge" title="Racha de días seguidos">
+      <svg class="flame-icon" viewBox="0 0 24 24">
+        <path d="M12,2C12,2 12,7 9,10C7,12 8,15 10,17C12,19 14,19 16,17C18,15 17,11 15,9C14,8 13,8 12,8C12,8 12,2 12,2Z" />
+      </svg>
+      <span class="streak-count">x1</span>
+    </div>
     <div class="xp-bar-level" id="xp-bar-level">1</div>
     <div class="xp-bar-track">
       <div class="xp-bar-fill" id="xp-bar-fill"></div>
@@ -63,7 +75,7 @@
     
     <div class="settings-title">Transparencia</div>
     <div class="transparency-control">
-      <input type="range" id="opacity-slider" min="0.05" max="0.5" step="0.01" value="0.15">
+      <input type="range" id="opacity-slider" min="0.05" max="1.0" step="0.01" value="1.0">
     </div>
 
     <div class="settings-footer">
@@ -89,7 +101,6 @@
     // ── Constants ──
     const CIRCUMFERENCE = 2 * Math.PI * 30;
     const BASE_XP = 100;
-    const XP_PER_COMMIT = 25;
     const GROWTH_FACTOR = 1.5;
 
     // ── DOM Elements ──
@@ -108,6 +119,8 @@
     const positionSelector = document.getElementById('position-selector');
     const exitAppBtn = document.getElementById('exit-app-btn');
     const backBtn = document.getElementById('back-btn');
+    const streakCountEls = document.querySelectorAll('.streak-count');
+    const streakBadges = document.querySelectorAll('.streak-badge');
 
     // ── State ──
     let level = 1;
@@ -116,8 +129,10 @@
     let isInitialized = false;
     let currentShape = 'circular';
     let currentTheme = 'cyan-green';
-    let currentOpacity = 0.15;
+    let currentOpacity = 1.0;
     let currentPosition = 'bottom-right';
+    let streak = 0;
+    let lastCommitDate = "";
 
     const THEMES = {
       'cyan-green': ['#00e5ff', '#76ff03'],
@@ -222,43 +237,81 @@
       ipcRenderer.send('update-opacity', val);
     };
 
-    function updateRing() {
+    function updateRing(animate = true) {
       const maxXP = getMaxXP(level);
       const progress = Math.min(currentXP / maxXP, 1);
       
       // Update Circle
+      if (!animate) progressEl.style.transition = 'none';
       const offset = CIRCUMFERENCE * (1 - progress);
       progressEl.style.strokeDashoffset = offset;
+      if (!animate) {
+        void progressEl.offsetWidth;
+        progressEl.style.transition = 'stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+      }
+      
       levelEl.textContent = level;
 
       // Update Bar
+      if (!animate) barFillEl.style.transition = 'none';
       barFillEl.style.width = `${progress * 100}%`;
+      if (!animate) {
+        void barFillEl.offsetWidth;
+        barFillEl.style.transition = 'width 0.4s ease-out';
+      }
+      
       barLevelEl.textContent = level;
 
       if (isInitialized) {
-        ipcRenderer.send('save-data', { level, currentXP, totalCommits });
+        ipcRenderer.send('save-data', { level, currentXP, totalCommits, streak, lastCommitDate });
       }
+    }
+
+    function updateStreak() {
+      const today = new Date().toISOString().split('T')[0];
+      if (lastCommitDate === today) return; // Already updated today
+
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+      if (lastCommitDate === yesterdayStr) {
+        streak++;
+      } else {
+        streak = 1;
+      }
+
+      lastCommitDate = today;
+      streakCountEls.forEach(el => el.textContent = `x${streak}`);
+      
+      // Flash the streak badge
+      streakBadges.forEach(badge => {
+        badge.classList.remove('pulse-anim');
+        void badge.offsetWidth;
+        badge.classList.add('pulse-anim');
+      });
     }
 
     function addXP(amount) {
       currentXP += amount;
       let maxXP = getMaxXP(level);
-      let levelsGained = 0;
 
-      while (currentXP >= maxXP) {
-        currentXP -= maxXP;
-        level++;
-        levelsGained++;
-        maxXP = getMaxXP(level);
-      }
-
-      if (levelsGained > 0) {
-        triggerLevelUpEffects();
+      if (currentXP >= maxXP) {
+        const overflow = currentXP - maxXP;
+        currentXP = maxXP; 
+        updateRing(true); // Animate fill to 100%
+        
+        setTimeout(() => {
+          level++;
+          currentXP = overflow;
+          updateRing(false); // Silently reset bar
+          triggerLevelUpEffects();
+        }, 600); // Wait for fill animation to complete
       } else {
+        updateRing(true);
         triggerGainXPEffects();
+        triggerXPOrbs();
       }
-
-      updateRing();
     }
 
     function triggerGainXPEffects() {
@@ -277,6 +330,15 @@
       const container = currentShape === 'circular' ? circleWrapper : horizontalWrapper;
       const levelBadge = currentShape === 'circular' ? levelEl : barLevelEl;
 
+      // Shake & Flash
+      container.classList.remove('shake-anim');
+      document.body.classList.remove('flash-anim');
+      void container.offsetWidth;
+      container.classList.add('shake-anim');
+      document.body.classList.add('flash-anim');
+
+      triggerFloatingText("LEVEL UP!");
+
       container.classList.remove('level-up-anim');
       void container.offsetWidth;
       container.classList.add('level-up-anim');
@@ -285,24 +347,89 @@
       void levelBadge.offsetWidth;
       levelBadge.classList.add('badge-pop');
 
-      triggerParticles();
-      setTimeout(() => document.body.classList.remove('is-animating'), 1500);
+      triggerParticles(true);
+      triggerXPOrbs(true); // More orbs on level up
+      
+      setTimeout(() => {
+        document.body.classList.remove('is-animating', 'flash-anim');
+        container.classList.remove('shake-anim');
+      }, 1500);
     }
 
-    function triggerParticles() {
+    function triggerFloatingText(text) {
+      const el = document.createElement('div');
+      el.className = 'floating-text';
+      el.textContent = text;
+      
+      const container = currentShape === 'circular' ? circleWrapper : horizontalWrapper;
+      const rect = container.getBoundingClientRect();
+      el.style.left = `${rect.left + rect.width / 2}px`;
+      el.style.top = `${rect.top}px`;
+      
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2000);
+    }
+
+    function triggerXPOrbs(isLevelUp = false) {
+      const container = currentShape === 'circular' ? circleWrapper : horizontalWrapper;
+      const rect = container.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      
+      const maxXP = getMaxXP(level);
+      const progress = Math.min(currentXP / maxXP, 1);
+      
+      let targetX, targetY;
+      
+      if (currentShape === 'circular') {
+        const radius = rect.width * 0.375;
+        const angle = -Math.PI / 2 + (progress * Math.PI * 2);
+        targetX = centerX + Math.cos(angle) * (radius);
+        targetY = centerY + Math.sin(angle) * (radius);
+      } else {
+        const fillRect = barFillEl.getBoundingClientRect();
+        targetX = Math.max(rect.left, fillRect.right);
+        targetY = centerY;
+      }
+
+      const count = isLevelUp ? 20 : 12;
+      for (let i = 0; i < count; i++) {
+        const orb = document.createElement('div');
+        orb.className = 'xp-orb';
+        
+        const spawnAngle = Math.random() * Math.PI * 2;
+        const spawnDistance = (currentShape === 'circular' ? 40 : 60) + Math.random() * 60;
+        const startX = targetX + Math.cos(spawnAngle) * spawnDistance;
+        const startY = targetY + Math.sin(spawnAngle) * spawnDistance;
+
+        orb.style.left = `${startX}px`;
+        orb.style.top = `${startY}px`;
+        orb.style.setProperty('--tx', `${targetX - startX}px`);
+        orb.style.setProperty('--ty', `${targetY - startY}px`);
+        orb.style.animationDelay = `${i * 0.05}s`;
+
+        document.body.appendChild(orb);
+        setTimeout(() => orb.remove(), 1200);
+      }
+    }
+    function triggerParticles(enhanced = false) {
       const container = currentShape === 'circular' ? circleWrapper : horizontalWrapper;
       // Center particles in the container
       const rect = container.getBoundingClientRect();
       particlesContainer.style.left = `${rect.left + rect.width / 2}px`;
       particlesContainer.style.top = `${rect.top + rect.height / 2}px`;
 
-      const count = currentShape === 'circular' ? 20 : 30;
+      const baseCount = currentShape === 'circular' ? 20 : 30;
+      const count = enhanced ? baseCount * 2.5 : baseCount;
+      
       for (let i = 0; i < count; i++) {
         const p = document.createElement('div');
         p.className = 'particle';
+        if (enhanced) p.classList.add('enhanced-particle');
+        
         const angle = Math.random() * Math.PI * 2;
-        const distance = 40 + Math.random() * 60;
-        const size = 3 + Math.random() * 5;
+        const distance = (enhanced ? 60 : 40) + Math.random() * (enhanced ? 100 : 60);
+        const size = (enhanced ? 4 : 3) + Math.random() * 5;
         
         p.style.width = `${size}px`;
         p.style.height = `${size}px`;
@@ -314,18 +441,29 @@
       }
     }
 
-    ipcRenderer.on('git-commit', () => {
-      totalCommits++;
-      addXP(XP_PER_COMMIT);
+    ipcRenderer.on('git-event', (event, type) => {
+      if (type === 'commit') {
+        totalCommits++;
+        updateStreak();
+        addXP(1);
+      } else if (type === 'push') {
+        addXP(25);
+      } else if (type === 'pr') {
+        addXP(50);
+      }
     });
 
     ipcRenderer.on('init-data', (event, data) => {
       level = data.level || 1;
       currentXP = data.currentXP || 0;
       totalCommits = data.totalCommits || 0;
+      streak = data.streak || 0;
+      lastCommitDate = data.lastCommitDate || "";
       currentShape = data.shape || 'circular';
       currentPosition = data.position || 'bottom-right';
       isInitialized = true;
+      
+      streakCountEls.forEach(el => el.textContent = `x${streak}`);
       
       if (data.theme) {
         currentTheme = data.theme;

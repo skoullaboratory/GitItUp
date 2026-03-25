@@ -2,6 +2,7 @@ const { app, BrowserWindow, screen, ipcMain, Tray, Menu, nativeImage } = require
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { exec } = require('child_process');
 
 app.disableHardwareAcceleration();
 
@@ -23,7 +24,7 @@ function loadData() {
     shape: 'circular',
     position: 'bottom-right',
     theme: 'cyan-green',
-    opacity: 0.15
+    opacity: 1.0
   };
 }
 
@@ -34,6 +35,42 @@ function saveData(data) {
     fs.writeFileSync(DATA_FILE, JSON.stringify(merged, null, 2));
   } catch (e) {
     console.error('Error saving XP data:', e);
+  }
+}
+
+// ── Git Automation ──
+function installGlobalHook() {
+  const hooksDir = path.join(app.getPath('userData'), 'hooks');
+  
+  try {
+    if (!fs.existsSync(hooksDir)) {
+      fs.mkdirSync(hooksDir, { recursive: true });
+    }
+
+    // Configuración de los 3 hooks
+    const hooks = [
+      { name: 'post-commit', type: 'commit' },
+      { name: 'pre-push', type: 'push' },
+      { name: 'post-merge', type: 'pr' }
+    ];
+
+    hooks.forEach(h => {
+      const content = `#!/bin/sh\n# GitItUp Auto-Hook\ncurl -s -X POST http://127.0.0.1:31415/${h.type} > /dev/null 2>&1 || true\n`;
+      fs.writeFileSync(path.join(hooksDir, h.name), content, { mode: 0o755 });
+    });
+
+    exec('git --version', (err) => {
+      if (err) return;
+      exec('git config --global core.hooksPath', (err, stdout) => {
+        const currentPath = stdout ? stdout.trim() : '';
+        const gitPath = hooksDir.replace(/\\/g, '/');
+        if (!currentPath || currentPath.toLowerCase() === gitPath.toLowerCase()) {
+          exec(`git config --global core.hooksPath "${gitPath}"`);
+        }
+      });
+    });
+  } catch (e) {
+    console.error('Exception during hook installation:', e);
   }
 }
 
@@ -283,8 +320,12 @@ ipcMain.on('save-data', (event, data) => saveData(data));
 const PORT = 31415;
 const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  if (req.method === 'POST' && req.url === '/commit') {
-    if (win && !win.isDestroyed()) win.webContents.send('git-commit');
+  
+  const endpoint = req.url.slice(1); // 'commit', 'push', or 'pr'
+  const validEvents = ['commit', 'push', 'pr'];
+
+  if (req.method === 'POST' && validEvents.includes(endpoint)) {
+    if (win && !win.isDestroyed()) win.webContents.send('git-event', endpoint);
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ ok: true }));
   } else if (req.method === 'GET' && req.url === '/status') {
@@ -306,6 +347,7 @@ if (!gotLock) {
 } else {
   app.on('second-instance', () => { if (win) win.show(); });
   app.on('ready', () => {
+    installGlobalHook();
     setTimeout(createWindow, 400);
   });
   app.on('window-all-closed', () => {
