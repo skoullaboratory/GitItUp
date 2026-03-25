@@ -55,7 +55,7 @@ function installGlobalHook() {
     ];
 
     hooks.forEach(h => {
-      const content = `#!/bin/sh\n# GitItUp Auto-Hook\ncurl -s -X POST http://127.0.0.1:31415/${h.type} > /dev/null 2>&1 || true\nexit 0\n`;
+      const content = `#!/bin/sh\n# GitItUp Auto-Hook\ncat - > /dev/null\ncurl -s -X POST http://127.0.0.1:31415/${h.type} > /dev/null 2>&1 || true\nexit 0\n`;
       fs.writeFileSync(path.join(hooksDir, h.name), content, { mode: 0o755 });
     });
 
