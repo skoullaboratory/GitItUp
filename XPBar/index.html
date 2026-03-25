@@ -40,11 +40,30 @@
 
   <!-- 3. Theme Selector Overlay -->
   <div class="theme-selector-container" id="theme-selector">
+    <div class="settings-title">Estilo</div>
+    <div class="segment-control" id="shape-selector">
+      <button class="segment-btn" data-value="circular">Circular</button>
+      <button class="segment-btn" data-value="horizontal">Horizontal</button>
+    </div>
+
+    <div class="settings-title">Posición</div>
+    <div class="position-grid" id="position-selector">
+      <!-- Dynamic Positions -->
+    </div>
+
     <div class="settings-title">Temas</div>
     <div class="theme-list" id="theme-list"></div>
+    
     <div class="settings-title">Transparencia</div>
     <div class="transparency-control">
       <input type="range" id="opacity-slider" min="0.05" max="0.5" step="0.01" value="0.15">
+    </div>
+
+    <div class="settings-footer">
+      <button class="exit-btn" id="exit-app-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Salir Aplicación
+      </button>
     </div>
   </div>
 
@@ -78,6 +97,9 @@
     const themeList = document.getElementById('theme-list');
     const settingsTrigger = document.getElementById('settings-trigger');
     const opacitySlider = document.getElementById('opacity-slider');
+    const shapeSelector = document.getElementById('shape-selector');
+    const positionSelector = document.getElementById('position-selector');
+    const exitAppBtn = document.getElementById('exit-app-btn');
 
     // ── State ──
     let level = 1;
@@ -87,6 +109,7 @@
     let currentShape = 'circular';
     let currentTheme = 'cyan-green';
     let currentOpacity = 0.15;
+    let currentPosition = 'bottom-right';
 
     const THEMES = {
       'cyan-green': ['#00e5ff', '#76ff03'],
@@ -116,6 +139,7 @@
         btn.title = key.replace('-', ' ');
         btn.onclick = () => {
           ipcRenderer.send('update-theme', key);
+          currentTheme = key;
           document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
         };
@@ -123,10 +147,58 @@
       });
     }
 
+    function initShapeSelector() {
+      const btns = shapeSelector.querySelectorAll('.segment-btn');
+      btns.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.value === currentShape);
+        btn.onclick = () => {
+          const val = btn.dataset.value;
+          currentShape = val;
+          ipcRenderer.send('update-shape', val);
+          refreshSettingsUI();
+        };
+      });
+    }
+
+    const POSITION_LABELS = {
+      'top-left': 'TL', 'top-right': 'TR', 'bottom-left': 'BL', 'bottom-right': 'BR',
+      'top': 'Arriba', 'bottom': 'Abajo'
+    };
+
+    function initPositionSelector() {
+      positionSelector.innerHTML = '';
+      const positions = currentShape === 'circular' ? 
+        ['top-left', 'top-right', 'bottom-left', 'bottom-right'] : 
+        ['top', 'bottom'];
+      
+      positions.forEach(pos => {
+        const btn = document.createElement('button');
+        btn.className = `pos-btn ${pos === currentPosition ? 'active' : ''}`;
+        btn.textContent = POSITION_LABELS[pos] || pos;
+        btn.onclick = () => {
+          currentPosition = pos;
+          ipcRenderer.send('update-position', pos);
+          refreshSettingsUI();
+        };
+        positionSelector.appendChild(btn);
+      });
+    }
+
+    function refreshSettingsUI() {
+      initShapeSelector();
+      initPositionSelector();
+      initThemes();
+    }
+
     settingsTrigger.onclick = (e) => {
       e.stopPropagation();
       const showing = document.body.classList.toggle('show-settings');
+      if (showing) refreshSettingsUI();
       ipcRenderer.send('expand-window', showing);
+    };
+
+    exitAppBtn.onclick = () => {
+      ipcRenderer.send('quit-app');
     };
 
     opacitySlider.oninput = (e) => {
@@ -237,6 +309,8 @@
       level = data.level || 1;
       currentXP = data.currentXP || 0;
       totalCommits = data.totalCommits || 0;
+      currentShape = data.shape || 'circular';
+      currentPosition = data.position || 'bottom-right';
       isInitialized = true;
       
       if (data.theme) {
@@ -253,11 +327,12 @@
       }
 
       updateRing();
-      initThemes();
+      refreshSettingsUI();
     });
 
     ipcRenderer.on('update-style', (event, { shape, position, theme }) => {
       currentShape = shape;
+      currentPosition = position;
       if (theme) {
         currentTheme = theme;
         const [c1, c2] = THEMES[theme] || THEMES['cyan-green'];
@@ -270,6 +345,7 @@
         });
       }
       document.body.className = `mode-${shape}${document.body.classList.contains('is-hovered') ? ' is-hovered' : ''}`;
+      refreshSettingsUI();
       // Tell main to refresh context menu checkmarks
       ipcRenderer.send('refresh-menu');
     });

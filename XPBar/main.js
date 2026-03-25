@@ -92,10 +92,28 @@ function getLayout(shape, position) {
 
 function updateAppLayout(shape, position, theme) {
   if (shape) currentData.shape = shape;
-  if (position) currentData.position = position;
   if (theme) currentData.theme = theme;
   
-  saveData({ shape: currentData.shape, position: currentData.position, theme: currentData.theme });
+  // Validate position based on shape if shape changed or position provided
+  if (shape) {
+    if (shape === 'circular') {
+      if (!['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(currentData.position)) {
+        currentData.position = 'bottom-right';
+      }
+    } else {
+      if (!['top', 'bottom'].includes(currentData.position)) {
+        currentData.position = 'bottom';
+      }
+    }
+  }
+  
+  if (position) currentData.position = position;
+
+  saveData({ 
+    shape: currentData.shape, 
+    position: currentData.position, 
+    theme: currentData.theme 
+  });
 
   const layout = getLayout(currentData.shape, currentData.position);
   if (win) {
@@ -108,27 +126,41 @@ function updateAppLayout(shape, position, theme) {
     // Ensure window is always on top after move
     win.setAlwaysOnTop(true, 'screen-saver', 1);
   }
+  if (tray) {
+    tray.setContextMenu(buildTrayMenu());
+  }
 }
 
 function expandWindow(expanded) {
   if (!win) return;
   const layout = getLayout(currentData.shape, currentData.position);
   if (expanded) {
-    if (currentData.shape === 'circular') {
-      win.setBounds({
-        x: layout.x - 150,
-        y: layout.y - 300,
-        width: 450,
-        height: 500
-      });
-    } else {
-      win.setBounds({
-        x: layout.x - 60,
-        y: layout.y - 250,
-        width: 600,
-        height: 400
-      });
-    }
+    const primaryDisplay = screen.getPrimaryDisplay();
+    const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
+    
+    let expWidth = currentData.shape === 'circular' ? 450 : 600;
+    let expHeight = currentData.shape === 'circular' ? 500 : 400;
+
+    // Center the expanded window on the bar's current location
+    let centerX = layout.x + layout.width / 2;
+    let centerY = layout.y + layout.height / 2;
+
+    let targetX = Math.floor(centerX - expWidth / 2);
+    let targetY = Math.floor(centerY - expHeight / 2);
+
+    // Padding from screen edges
+    const p = 20;
+    if (targetX < p) targetX = p;
+    if (targetY < p) targetY = p;
+    if (targetX + expWidth > screenWidth - p) targetX = screenWidth - expWidth - p;
+    if (targetY + expHeight > screenHeight - p) targetY = screenHeight - expHeight - p;
+
+    win.setBounds({
+      x: targetX,
+      y: targetY,
+      width: expWidth,
+      height: expHeight
+    });
   } else {
     win.setBounds(layout);
   }
@@ -211,6 +243,18 @@ function createWindow() {
 
   ipcMain.on('update-theme', (event, theme) => {
     updateAppLayout(null, null, theme);
+  });
+
+  ipcMain.on('update-shape', (event, shape) => {
+    updateAppLayout(shape, null, null);
+  });
+
+  ipcMain.on('update-position', (event, position) => {
+    updateAppLayout(null, position, null);
+  });
+
+  ipcMain.on('quit-app', () => {
+    app.quit();
   });
 
   ipcMain.on('expand-window', (event, expanded) => {
