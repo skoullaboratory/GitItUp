@@ -55,7 +55,8 @@ function installGlobalHook() {
     ];
 
     hooks.forEach(h => {
-      const content = `#!/bin/sh\n# GitItUp Auto-Hook\ncat - > /dev/null\ncurl -s -X POST http://127.0.0.1:31415/${h.type} > /dev/null 2>&1 || true\nexit 0\n`;
+      // Usamos & para que curl corra en segundo plano y no bloquee a Git
+      const content = `#!/bin/sh\n# GitItUp Auto-Hook\ncurl -s -X POST http://127.0.0.1:31415/${h.type} > /dev/null 2>&1 &\nexit 0\n`;
       fs.writeFileSync(path.join(hooksDir, h.name), content, { mode: 0o755 });
     });
 
@@ -82,6 +83,7 @@ const GROWTH_FACTOR = 1.5;
 function getMaxXP(level) {
   return Math.floor(BASE_XP * Math.pow(GROWTH_FACTOR, level - 1));
 }
+
 
 // ── Window & Layout ──
 let win = null;
@@ -321,9 +323,8 @@ const PORT = 31415;
 const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   
-  // Parse endpoint (handle both /commit and /commit?...)
-  const url = new URL(req.url, `http://${req.headers.host}`);
-  const endpoint = url.pathname.slice(1); 
+  // Extraer endpoint (commit, push, pr)
+  const endpoint = req.url.split('?')[0].slice(1);
   const validEvents = ['commit', 'push', 'pr'];
 
   if (req.method === 'POST' && validEvents.includes(endpoint)) {

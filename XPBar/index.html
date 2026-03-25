@@ -442,14 +442,21 @@
     }
 
     ipcRenderer.on('git-event', (event, type) => {
+      console.log(`[Frontend] Evento de Git detectado: ${type}`);
+      
+      let xpToAdd = 0;
       if (type === 'commit') {
         totalCommits++;
         updateStreak();
-        addXP(1);
+        xpToAdd = 1;
       } else if (type === 'push') {
-        addXP(25);
+        xpToAdd = 25;
       } else if (type === 'pr') {
-        addXP(50);
+        xpToAdd = 50;
+      }
+
+      if (xpToAdd > 0) {
+        addXP(xpToAdd);
       }
     });
 
